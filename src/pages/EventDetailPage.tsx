@@ -15,7 +15,7 @@ export default function EventDetailPage() {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isEditTeamModalOpen, setIsEditTeamModalOpen] = useState(false);
   const [isEditEventModalOpen, setIsEditEventModalOpen] = useState(false);
-  const [editingTeam, setEditingTeam] = useState<{ id: string; name: string } | null>(null);
+  const [editingTeam, setEditingTeam] = useState<{ id: string; name: string; strength: number } | null>(null);
   const [dragOverTeamId, setDragOverTeamId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -31,6 +31,7 @@ export default function EventDetailPage() {
     const newTeam = {
       id: crypto.randomUUID(),
       name: `Team ${event.teams.length + 1}`,
+      strength: 2,
       selectedPlayers: [],
     };
 
@@ -45,16 +46,16 @@ export default function EventDetailPage() {
     }
   };
 
-  const handleEditTeamName = (teamId: string, currentName: string) => {
-    setEditingTeam({ id: teamId, name: currentName });
+  const handleEditTeamName = (teamId: string, currentName: string, currentStrength: number) => {
+    setEditingTeam({ id: teamId, name: currentName, strength: currentStrength });
     setIsEditTeamModalOpen(true);
   };
 
-  const handleSaveTeamName = (newName: string) => {
+  const handleSaveTeamName = (newName: string, newStrength: number) => {
     if (!event || !id || !editingTeam) return;
 
     const updatedTeams = event.teams.map(team =>
-      team.id === editingTeam.id ? { ...team, name: newName } : team
+      team.id === editingTeam.id ? { ...team, name: newName, strength: newStrength } : team
     );
 
     const success = updateEvent(id, { teams: updatedTeams });
@@ -311,7 +312,7 @@ export default function EventDetailPage() {
                         </p>
                       </div>
                       <button 
-                        onClick={() => handleEditTeamName(team.id, team.name)}
+                        onClick={() => handleEditTeamName(team.id, team.name, team.strength || 2)}
                         className="text-blue-600 hover:text-blue-700 text-sm"
                       >
                         Edit
@@ -387,6 +388,7 @@ export default function EventDetailPage() {
         onClose={() => setIsEditTeamModalOpen(false)}
         onSave={handleSaveTeamName}
         currentName={editingTeam?.name || ''}
+        currentStrength={editingTeam?.strength || 2}
       />
 
       <EditEventModal

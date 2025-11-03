@@ -5,26 +5,30 @@ import Button from './ui/Button';
 interface EditTeamNameModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (name: string) => void;
+  onSave: (name: string, strength: number) => void;
   currentName: string;
+  currentStrength: number;
 }
 
 export default function EditTeamNameModal({ 
   isOpen, 
   onClose, 
   onSave, 
-  currentName 
+  currentName,
+  currentStrength
 }: EditTeamNameModalProps) {
   const [teamName, setTeamName] = useState(currentName);
+  const [strength, setStrength] = useState(currentStrength);
 
   useEffect(() => {
     setTeamName(currentName);
-  }, [currentName, isOpen]);
+    setStrength(currentStrength);
+  }, [currentName, currentStrength, isOpen]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (teamName.trim()) {
-      onSave(teamName.trim());
+      onSave(teamName.trim(), strength);
       onClose();
     }
   };
@@ -32,25 +36,43 @@ export default function EditTeamNameModal({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalHeader>
-        <ModalTitle>Edit Team Name</ModalTitle>
+        <ModalTitle>Edit Team</ModalTitle>
       </ModalHeader>
 
       <form onSubmit={handleSubmit}>
         <ModalBody>
-          <div>
-            <label htmlFor="teamName" className="form-label">
-              Team Name
-            </label>
-            <input
-              type="text"
-              id="teamName"
-              value={teamName}
-              onChange={(e) => setTeamName(e.target.value)}
-              required
-              className="form-input"
-              placeholder="Enter team name"
-              autoFocus
-            />
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="teamName" className="form-label">
+                Team Name
+              </label>
+              <input
+                type="text"
+                id="teamName"
+                value={teamName}
+                onChange={(e) => setTeamName(e.target.value)}
+                required
+                className="form-input"
+                placeholder="Enter team name"
+                autoFocus
+              />
+            </div>
+
+            <div>
+              <label htmlFor="strength" className="form-label">
+                Strength
+              </label>
+              <select
+                id="strength"
+                value={strength}
+                onChange={(e) => setStrength(parseInt(e.target.value))}
+                className="form-input"
+              >
+                <option value={1}>1 - Highest</option>
+                <option value={2}>2 - Medium</option>
+                <option value={3}>3 - Lowest</option>
+              </select>
+            </div>
           </div>
         </ModalBody>
 

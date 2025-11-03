@@ -9,6 +9,7 @@ export interface Player {
 export interface Team {
   id: string;
   name: string;
+  strength: number; // 1 (highest) to 3 (lowest), default 2
   selectedPlayers: string[]; // Player IDs assigned to this team
 }
 
