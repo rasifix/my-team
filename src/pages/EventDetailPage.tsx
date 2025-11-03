@@ -4,6 +4,7 @@ import { getEventById, updateEvent, getPlayerById } from '../utils/localStorage'
 import type { Event, Invitation } from '../types';
 import InvitePlayersModal from '../components/InvitePlayersModal';
 import PlayerInvitationsCard from '../components/PlayerInvitationsCard';
+import EditTeamNameModal from '../components/EditTeamNameModal';
 import { autoSelectTeams } from '../utils/selectionAlgorithm';
 import Level from '../components/Level';
 
@@ -11,6 +12,8 @@ export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [event, setEvent] = useState<Event | null>(null);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [isEditTeamModalOpen, setIsEditTeamModalOpen] = useState(false);
+  const [editingTeam, setEditingTeam] = useState<{ id: string; name: string } | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -37,6 +40,31 @@ export default function EventDetailPage() {
         teams: updatedTeams,
       });
     }
+  };
+
+  const handleEditTeamName = (teamId: string, currentName: string) => {
+    setEditingTeam({ id: teamId, name: currentName });
+    setIsEditTeamModalOpen(true);
+  };
+
+  const handleSaveTeamName = (newName: string) => {
+    if (!event || !id || !editingTeam) return;
+
+    const updatedTeams = event.teams.map(team =>
+      team.id === editingTeam.id ? { ...team, name: newName } : team
+    );
+
+    const success = updateEvent(id, { teams: updatedTeams });
+
+    if (success) {
+      setEvent({
+        ...event,
+        teams: updatedTeams,
+      });
+    }
+
+    setEditingTeam(null);
+    setIsEditTeamModalOpen(false);
   };
 
   const handleInvitePlayers = (playerIds: string[]) => {
@@ -189,7 +217,10 @@ export default function EventDetailPage() {
                           Selected: {selectedPlayers.length}/{event.maxPlayersPerTeam}
                         </p>
                       </div>
-                      <button className="text-blue-600 hover:text-blue-700 text-sm">
+                      <button 
+                        onClick={() => handleEditTeamName(team.id, team.name)}
+                        className="text-blue-600 hover:text-blue-700 text-sm"
+                      >
                         Edit
                       </button>
                     </div>
@@ -248,6 +279,13 @@ export default function EventDetailPage() {
         onClose={() => setIsInviteModalOpen(false)}
         onInvite={handleInvitePlayers}
         alreadyInvitedPlayerIds={event.invitations.map(inv => inv.playerId)}
+      />
+
+      <EditTeamNameModal
+        isOpen={isEditTeamModalOpen}
+        onClose={() => setIsEditTeamModalOpen(false)}
+        onSave={handleSaveTeamName}
+        currentName={editingTeam?.name || ''}
       />
     </div>
   );
