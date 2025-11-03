@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { Player } from '../types';
+import { Modal, ModalHeader, ModalTitle, ModalBody, ModalFooter } from './ui';
+import Button from './ui/Button';
 
 interface AddPlayerModalProps {
   isOpen: boolean;
@@ -65,31 +67,19 @@ export default function AddPlayerModal({ isOpen, onClose, onSave, onUpdate, edit
       ...prev,
       [name]: name === 'birthYear' || name === 'level' ? parseInt(value) : value
     }));
-  };  if (!isOpen) return null;
+  };  return (
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <ModalHeader>
+        <ModalTitle>
+          {isEditMode ? 'Edit Player' : 'Add New Player'}
+        </ModalTitle>
+      </ModalHeader>
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-screen overflow-y-auto">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900">
-              {isEditMode ? 'Edit Player' : 'Add New Player'}
-            </h3>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 focus:outline-none"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <form onSubmit={handleSubmit} className="px-6 py-4">
+      <form onSubmit={handleSubmit}>
+        <ModalBody>
           <div className="space-y-4">
             <div>
-              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="firstName" className="form-label">
                 First Name
               </label>
               <input
@@ -99,13 +89,13 @@ export default function AddPlayerModal({ isOpen, onClose, onSave, onUpdate, edit
                 value={formData.firstName}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="form-input"
                 placeholder="Enter first name"
               />
             </div>
 
             <div>
-              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="lastName" className="form-label">
                 Last Name
               </label>
               <input
@@ -115,13 +105,13 @@ export default function AddPlayerModal({ isOpen, onClose, onSave, onUpdate, edit
                 value={formData.lastName}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="form-input"
                 placeholder="Enter last name"
               />
             </div>
 
             <div>
-              <label htmlFor="birthYear" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="birthYear" className="form-label">
                 Birth Year
               </label>
               <input
@@ -133,12 +123,12 @@ export default function AddPlayerModal({ isOpen, onClose, onSave, onUpdate, edit
                 min="1950"
                 max={new Date().getFullYear()}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="form-input"
               />
             </div>
 
             <div>
-              <label htmlFor="level" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="level" className="form-label">
                 Level (1-5)
               </label>
               <select
@@ -146,7 +136,7 @@ export default function AddPlayerModal({ isOpen, onClose, onSave, onUpdate, edit
                 name="level"
                 value={formData.level}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="form-select"
               >
                 <option value={1}>1 - Beginner</option>
                 <option value={2}>2 - Novice</option>
@@ -156,24 +146,26 @@ export default function AddPlayerModal({ isOpen, onClose, onSave, onUpdate, edit
               </select>
             </div>
           </div>
+        </ModalBody>
 
-          <div className="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              {isEditMode ? 'Update Player' : 'Add Player'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <ModalFooter>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={onClose}
+            className="flex-1"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            variant="primary"
+            className="flex-1"
+          >
+            {isEditMode ? 'Update Player' : 'Add Player'}
+          </Button>
+        </ModalFooter>
+      </form>
+    </Modal>
   );
 }

@@ -3,12 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { useEvents } from '../hooks/useEvents';
 import EventsList from '../components/EventsList';
 import AddEventModal from '../components/AddEventModal';
-import type { Team } from '../types';
+import ConfirmDialog from '../components/ConfirmDialog';
+import type { Team, Event } from '../types';
+import { Card, CardBody, CardTitle } from '../components/ui';
+import Button from '../components/ui/Button';
 
 export default function EventsPage() {
   const navigate = useNavigate();
-  const { events, addEvent } = useEvents();
+  const { events, addEvent, deleteEvent } = useEvents();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
 
   const handleAddEvent = (eventData: { 
     name: string; 
@@ -44,33 +49,68 @@ export default function EventsPage() {
     navigate(`/events/${eventId}`);
   };
 
+  const handleDeleteEvent = (event: Event) => {
+    setEventToDelete(event);
+    setIsConfirmDialogOpen(true);
+  };
+
+  const confirmDeleteEvent = () => {
+    if (eventToDelete) {
+      deleteEvent(eventToDelete.id);
+      setEventToDelete(null);
+    }
+    setIsConfirmDialogOpen(false);
+  };
+
+  const cancelDeleteEvent = () => {
+    setEventToDelete(null);
+    setIsConfirmDialogOpen(false);
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Events</h1>
-        <p className="mt-2 text-gray-600">
+    <div className="page-container">
+      <div className="page-header">
+        <h1 className="page-title">Events</h1>
+        <p className="page-subtitle">
           View and manage soccer events and team selections.
         </p>
       </div>
 
-      <div className="bg-white shadow rounded-lg p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">All Events</h2>
-          <button 
-            onClick={() => setIsModalOpen(true)}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-          >
-            Create Event
-          </button>
-        </div>
-        
-        <EventsList events={events} onEventClick={handleEventClick} />
-      </div>
+      <Card>
+        <CardBody>
+          <div className="flex justify-between items-center mb-4">
+            <CardTitle>All Events</CardTitle>
+            <Button 
+              variant="success"
+              onClick={() => setIsModalOpen(true)}
+            >
+              Create Event
+            </Button>
+          </div>
+          
+          <EventsList 
+            events={events} 
+            onEventClick={handleEventClick}
+            onDelete={handleDeleteEvent}
+          />
+        </CardBody>
+      </Card>
 
       <AddEventModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onAdd={handleAddEvent}
+      />
+
+      <ConfirmDialog
+        isOpen={isConfirmDialogOpen}
+        title="Delete Event"
+        message={`Are you sure you want to delete "${eventToDelete?.name}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={confirmDeleteEvent}
+        onCancel={cancelDeleteEvent}
+        confirmButtonColor="red"
       />
     </div>
   );

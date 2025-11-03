@@ -67,7 +67,7 @@ export default function PlayersList({ players, onEdit, onDelete }: PlayersListPr
   };
 
   return (
-    <div className="space-y-1" onClick={handleBackdropClick}>
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3" onClick={handleBackdropClick}>
       {players.map((player) => (
         <div 
           key={player.id}
@@ -86,10 +86,7 @@ export default function PlayersList({ players, onEdit, onDelete }: PlayersListPr
               <div className="flex items-center justify-between">
                 <div className="truncate">
                   <p className="text-sm font-medium text-gray-900 truncate">
-                    {player.firstName} {player.lastName}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {player.birthYear}
+                    {player.firstName} {player.lastName} <span className="text-xs text-gray-500">{player.birthYear}</span>
                   </p>
                 </div>
                 {/* Level - stars */}

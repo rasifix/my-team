@@ -15,7 +15,7 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           {/* Logo/Title */}
           <Link to="/" className="flex items-center">
-            <h1 className="text-xl font-bold">My Teams</h1>
+            <h1 className="text-xl font-bold">My Team</h1>
           </Link>
 
           {/* Desktop Navigation */}

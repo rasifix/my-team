@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { getPlayers, getEvents } from '../utils/localStorage';
 import type { Player } from '../types';
 import Level from '../components/Level';
+import { Card, CardBody, CardTitle, SummaryCard, SummaryCardContent } from '../components/ui';
 
 interface PlayerStats {
   player: Player;
@@ -67,111 +68,97 @@ export default function StatisticsPage() {
     : 0;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Statistics</h1>
-        <p className="mt-2 text-gray-600">
+    <div className="page-container">
+      <div className="page-header">
+        <h1 className="page-title">Statistics</h1>
+        <p className="page-subtitle">
           View player attendance and selection fairness metrics.
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        {/* Summary Cards */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-sm font-medium text-gray-500">Total Players</h3>
-          <p className="text-2xl font-bold text-gray-900">{totalPlayers}</p>
-        </div>
+        <SummaryCard>
+          <SummaryCardContent label="Total Players" value={totalPlayers} />
+        </SummaryCard>
         
-        <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-sm font-medium text-gray-500">Total Events</h3>
-          <p className="text-2xl font-bold text-gray-900">{totalEvents}</p>
-        </div>
+        <SummaryCard>
+          <SummaryCardContent label="Total Events" value={totalEvents} />
+        </SummaryCard>
         
-        <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-sm font-medium text-gray-500">Avg Selections per Player</h3>
-          <p className="text-2xl font-bold text-gray-900">{avgSelections.toFixed(1)}</p>
-        </div>
+        <SummaryCard>
+          <SummaryCardContent label="Avg Selections per Player" value={avgSelections.toFixed(1)} />
+        </SummaryCard>
       </div>
 
-      {/* Player Statistics Table */}
-      <div className="bg-white shadow rounded-lg p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Player Statistics</h2>
+      <Card>
+        <CardBody>
+          <CardTitle>Player Statistics</CardTitle>
         
         {playerStats.length === 0 ? (
-          <div className="text-gray-500 text-center py-8">
+          <div className="empty-state">
             <p>No player data available yet. Add players and events to see statistics.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50 hidden md:table-header-group">
+          <div className="table-container">
+            <table className="table">
+              <thead className="table-header hidden md:table-header-group">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Player
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Invited
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Accepted
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Selected
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Acceptance Rate
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Selection Rate
-                  </th>
+                  <th className="table-header-cell">Player</th>
+                  <th className="table-header-cell">Invited</th>
+                  <th className="table-header-cell">Accepted</th>
+                  <th className="table-header-cell">Selected</th>
+                  <th className="table-header-cell">Acceptance Rate</th>
+                  <th className="table-header-cell">Selection Rate</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="table-body">
                 {playerStats.map((stat) => (
-                  <tr key={stat.player.id} className="hover:bg-gray-50">
+                  <tr key={stat.player.id} className="table-row">
                     {/* Desktop view */}
-                    <td className="px-6 py-4 whitespace-nowrap hidden md:table-cell">
+                    <td className="table-cell hidden md:table-cell">
                       <div className="text-sm font-medium text-gray-900">
                         {stat.player.firstName} {stat.player.lastName}
-                        <span className="text-xs text-gray-500 m-2 gap-2">{stat.player.birthYear}</span>
+                        <span className="text-xs text-muted m-2">{stat.player.birthYear}</span>
                       </div>
-                      <div className="text-xs text-gray-500 flex items-center gap-2">
+                      <div className="text-xs flex items-center gap-2">
                         <Level level={stat.player.level} className="text-xs" />
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
+                    <td className="table-cell hidden md:table-cell">
                       {stat.invitedCount}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
+                    <td className="table-cell hidden md:table-cell">
                       {stat.acceptedCount}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
+                    <td className="table-cell hidden md:table-cell">
                       <span className="font-semibold">{stat.selectedCount}</span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 hidden md:table-cell">
+                    <td className="table-cell text-gray-600 hidden md:table-cell">
                       {stat.acceptanceRate.toFixed(0)}%
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 hidden md:table-cell">
+                    <td className="table-cell text-gray-600 hidden md:table-cell">
                       {stat.selectionRate.toFixed(0)}%
                     </td>
                     
                     {/* Mobile view */}
                     <td className="px-4 py-3 md:hidden" colSpan={6}>
                       <div className="text-sm font-medium text-gray-900 mb-1 text-center">
-                        {stat.player.firstName} {stat.player.lastName} <span className="text-xs text-gray-500 m-2 gap-2">{stat.player.birthYear}</span> <Level level={stat.player.level} className="text-xs" />
+                        {stat.player.firstName} {stat.player.lastName}{' '}
+                        <span className="text-xs text-muted m-2">{stat.player.birthYear}</span>{' '}
+                        <Level level={stat.player.level} className="text-xs" />
                       </div>
                       <div className="grid grid-cols-3 gap-2 text-xs">
                         <div className="text-center">
                           <div className="font-semibold text-gray-900">{stat.invitedCount}</div>
-                          <div className="text-gray-500">Invited</div>
+                          <div className="text-muted">Invited</div>
                         </div>
                         <div className="text-center">
                           <div className="font-semibold text-gray-900">{stat.acceptedCount} ({stat.acceptanceRate.toFixed(0)}%)</div>
-                          <div className="text-gray-500">Accepted</div>
+                          <div className="text-muted">Accepted</div>
                         </div>
                         <div className="text-center">
                           <div className="font-semibold text-green-600">{stat.selectedCount} ({stat.selectionRate.toFixed(0)}%)</div>
-                          <div className="text-gray-500">Selected</div>
+                          <div className="text-muted">Selected</div>
                         </div>
                       </div>
                     </td>
@@ -181,7 +168,8 @@ export default function StatisticsPage() {
             </table>
           </div>
         )}
-      </div>
+        </CardBody>
+      </Card>
     </div>
   );
 }

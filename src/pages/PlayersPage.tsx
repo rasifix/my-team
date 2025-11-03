@@ -3,6 +3,8 @@ import AddPlayerModal from '../components/AddPlayerModal';
 import ConfirmDialog from '../components/ConfirmDialog';
 import PlayersList from '../components/PlayersList';
 import { usePlayers } from '../hooks/usePlayers';
+import { Card, CardBody, CardTitle } from '../components/ui';
+import Button from '../components/ui/Button';
 
 export default function PlayersPage() {
   const { players, loading, error, addPlayer, updatePlayer, deletePlayer } = usePlayers();
@@ -56,20 +58,20 @@ export default function PlayersPage() {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="text-center py-8">
-          <p className="text-gray-600">Loading players...</p>
+      <div className="page-container">
+        <div className="empty-state">
+          <p>Loading players...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Players</h1>
-        <p className="mt-2 text-gray-600">
-          Manage your soccer players, their scores, and information.
+    <div className="page-container">
+      <div className="page-header">
+        <h1 className="page-title">Players</h1>
+        <p className="page-subtitle">
+          Manage your soccer players, their levels, and information.
         </p>
       </div>
 
@@ -79,26 +81,28 @@ export default function PlayersPage() {
         </div>
       )}
 
-      <div className="bg-white shadow rounded-lg p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">All Players</h2>
-          <button 
-            onClick={() => {
-              setEditingPlayer(null);
-              setIsModalOpen(true);
-            }}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-          >
-            Add Player
-          </button>
-        </div>
+      <Card>
+        <CardBody>
+          <div className="flex justify-between items-center mb-4">
+            <CardTitle>All Players</CardTitle>
+            <Button 
+              variant="primary"
+              onClick={() => {
+                setEditingPlayer(null);
+                setIsModalOpen(true);
+              }}
+            >
+              Add Player
+            </Button>
+          </div>
         
-        <PlayersList
-          players={players}
-          onEdit={handleEditPlayer}
-          onDelete={handleDeletePlayer}
-        />
-      </div>
+          <PlayersList
+            players={players}
+            onEdit={handleEditPlayer}
+            onDelete={handleDeletePlayer}
+          />
+        </CardBody>
+      </Card>
 
       <AddPlayerModal
         isOpen={isModalOpen}

@@ -19,6 +19,26 @@ export default function EventDetailPage() {
     }
   }, [id]);
 
+  const handleAddTeam = () => {
+    if (!event || !id) return;
+
+    const newTeam = {
+      id: crypto.randomUUID(),
+      name: `Team ${event.teams.length + 1}`,
+      selectedPlayers: [],
+    };
+
+    const updatedTeams = [...event.teams, newTeam];
+    const success = updateEvent(id, { teams: updatedTeams });
+
+    if (success) {
+      setEvent({
+        ...event,
+        teams: updatedTeams,
+      });
+    }
+  };
+
   const handleInvitePlayers = (playerIds: string[]) => {
     if (!event || !id) return;
 
@@ -110,9 +130,9 @@ export default function EventDetailPage() {
 
   if (!event) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="text-center">
-          <p className="text-gray-500">Event not found.</p>
+      <div className="page-container">
+        <div className="empty-state">
+          <p>Event not found.</p>
         </div>
       </div>
     );
@@ -129,10 +149,10 @@ export default function EventDetailPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">{event.name}</h1>
-        <p className="mt-2 text-gray-600">
+    <div className="page-container">
+      <div className="page-header">
+        <h1 className="page-title">{event.name}</h1>
+        <p className="page-subtitle">
           {formatDate(event.date)} at {event.startTime}
         </p>
         <p className="mt-3 text-gray-600">
@@ -142,15 +162,18 @@ export default function EventDetailPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Teams Section */}
-        <div className="bg-white shadow rounded-lg p-6">
+        <div className="card card-body">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Teams</h2>
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
+            <h2 className="card-title">Teams</h2>
+            <button 
+              onClick={handleAddTeam}
+              className="btn-primary btn-sm"
+            >
               Add Team
             </button>
           </div>
           {event.teams.length === 0 ? (
-            <div className="text-gray-500 text-center py-4">
+            <div className="empty-state">
               <p>No teams configured yet.</p>
             </div>
           ) : (
