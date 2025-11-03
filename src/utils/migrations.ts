@@ -1,3 +1,46 @@
+// Migration to rename player property from 'score' to 'level'
+export function migrateScoreToLevel(): void {
+  try {
+    const playersJson = localStorage.getItem('players');
+    if (!playersJson) {
+      console.log('No players to migrate');
+      return;
+    }
+
+    const players = JSON.parse(playersJson);
+    let migratedCount = 0;
+
+    const migratedPlayers = players.map((player: any) => {
+      // Check if player already has 'level' property
+      if (player.level !== undefined) {
+        return player; // Already migrated
+      }
+
+      // Check if player has old 'score' property
+      if (player.score !== undefined) {
+        migratedCount++;
+        const { score, ...playerWithoutScore } = player;
+        return {
+          ...playerWithoutScore,
+          level: score,
+        };
+      }
+
+      // Player has neither - set default level
+      return {
+        ...player,
+        level: 3,
+      };
+    });
+
+    // Save migrated players back to localStorage
+    localStorage.setItem('players', JSON.stringify(migratedPlayers));
+    console.log(`Player migration completed: ${migratedCount} player(s) migrated from 'score' to 'level'`);
+  } catch (error) {
+    console.error('Player migration failed:', error);
+  }
+}
+
 // Migration to move maxPlayers from team level to event level
 export function migrateMaxPlayersToEvent(): void {
   try {

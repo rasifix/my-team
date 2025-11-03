@@ -29,7 +29,7 @@ function calculateTeamBalance(teams: Team[], players: Player[], playerStats: Map
     
     if (teamPlayers.length === 0) return 0;
     
-    const avgSkill = teamPlayers.reduce((sum, p) => sum + p.score, 0) / teamPlayers.length;
+    const avgSkill = teamPlayers.reduce((sum, p) => sum + p.level, 0) / teamPlayers.length;
     return avgSkill;
   });
 
@@ -75,12 +75,12 @@ export function autoSelectTeams(event: Event): Team[] {
     }));
   }
 
-  // Sort players by participation (ascending) then by skill (descending for balance)
+  // Sort players by participation (ascending) then by level (descending for balance)
   const sortedPlayers = [...playersWithStats].sort((a, b) => {
     if (a.eventsParticipated !== b.eventsParticipated) {
       return a.eventsParticipated - b.eventsParticipated; // Less participation first
     }
-    return b.score - a.score; // Higher skill first within same participation
+    return b.level - a.level; // Higher level first within same participation
   });
 
   // Initialize teams with empty selectedPlayers arrays
@@ -215,7 +215,7 @@ export function getSelectionStats(event: Event) {
       .filter(Boolean) as Player[];
     
     const avgSkill = teamPlayers.length > 0
-      ? teamPlayers.reduce((sum, p) => sum + p.score, 0) / teamPlayers.length
+      ? teamPlayers.reduce((sum, p) => sum + p.level, 0) / teamPlayers.length
       : 0;
 
     return {

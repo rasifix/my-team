@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import type { Player } from '../types';
 import { getPlayers, addPlayer, updatePlayer, deletePlayer } from '../utils/localStorage';
 
-// Helper function to sort players by score (descending), then by lastName, then by firstName
+// Helper function to sort players by level (descending), then by lastName, then by firstName
 function sortPlayers(players: Player[]): Player[] {
   return [...players].sort((a, b) => {
-    // First sort by score (descending - higher scores first)
-    if (a.score !== b.score) {
-      return b.score - a.score;
+    // First sort by level (descending - higher levels first)
+    if (a.level !== b.level) {
+      return b.level - a.level;
     }
     // Then sort by lastName (ascending - alphabetical)
     const lastNameCompare = a.lastName.toLowerCase().localeCompare(b.lastName.toLowerCase());

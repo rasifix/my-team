@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getPlayers, getEvents } from '../utils/localStorage';
 import type { Player } from '../types';
+import Level from '../components/Level';
 
 interface PlayerStats {
   player: Player;
@@ -47,8 +48,14 @@ export default function StatisticsPage() {
       };
     });
 
-    // Sort by invited count (descending)
-    stats.sort((a, b) => b.invitedCount - a.invitedCount);
+    // Sort by last name, then first name
+    stats.sort((a, b) => {
+      const lastNameCompare = a.player.lastName.toLowerCase().localeCompare(b.player.lastName.toLowerCase());
+      if (lastNameCompare !== 0) {
+        return lastNameCompare;
+      }
+      return a.player.firstName.toLowerCase().localeCompare(b.player.firstName.toLowerCase());
+    });
 
     setPlayerStats(stats);
   }, []);
@@ -97,7 +104,7 @@ export default function StatisticsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50 hidden md:table-header-group">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Player
@@ -122,28 +129,51 @@ export default function StatisticsPage() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {playerStats.map((stat) => (
                   <tr key={stat.player.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    {/* Desktop view */}
+                    <td className="px-6 py-4 whitespace-nowrap hidden md:table-cell">
                       <div className="text-sm font-medium text-gray-900">
                         {stat.player.firstName} {stat.player.lastName}
+                        <span className="text-xs text-gray-500 m-2 gap-2">{stat.player.birthYear}</span>
                       </div>
-                      <div className="text-xs text-gray-500">
-                        Skill: {stat.player.score} | {stat.player.birthYear}
+                      <div className="text-xs text-gray-500 flex items-center gap-2">
+                        <Level level={stat.player.level} className="text-xs" />
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
                       {stat.invitedCount}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
                       {stat.acceptedCount}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
                       <span className="font-semibold">{stat.selectedCount}</span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 hidden md:table-cell">
                       {stat.acceptanceRate.toFixed(0)}%
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 hidden md:table-cell">
                       {stat.selectionRate.toFixed(0)}%
+                    </td>
+                    
+                    {/* Mobile view */}
+                    <td className="px-4 py-3 md:hidden" colSpan={6}>
+                      <div className="text-sm font-medium text-gray-900 mb-1 text-center">
+                        {stat.player.firstName} {stat.player.lastName} <span className="text-xs text-gray-500 m-2 gap-2">{stat.player.birthYear}</span> <Level level={stat.player.level} className="text-xs" />
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 text-xs">
+                        <div className="text-center">
+                          <div className="font-semibold text-gray-900">{stat.invitedCount}</div>
+                          <div className="text-gray-500">Invited</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="font-semibold text-gray-900">{stat.acceptedCount} ({stat.acceptanceRate.toFixed(0)}%)</div>
+                          <div className="text-gray-500">Accepted</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="font-semibold text-green-600">{stat.selectedCount} ({stat.selectionRate.toFixed(0)}%)</div>
+                          <div className="text-gray-500">Selected</div>
+                        </div>
+                      </div>
                     </td>
                   </tr>
                 ))}

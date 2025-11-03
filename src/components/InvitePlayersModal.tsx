@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getPlayers } from '../utils/localStorage';
 import type { Player } from '../types';
+import Level from './Level';
 
 interface InvitePlayersModalProps {
   isOpen: boolean;
@@ -126,7 +127,7 @@ export default function InvitePlayersModal({
                           </span>
                           <div className="flex items-center gap-3 text-sm text-gray-600">
                             <span>Born: {player.birthYear}</span>
-                            <span>Skill: {player.score}/5</span>
+                            <Level level={player.level} />
                           </div>
                         </div>
                       </div>

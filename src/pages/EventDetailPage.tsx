@@ -5,6 +5,7 @@ import type { Event, Invitation } from '../types';
 import InvitePlayersModal from '../components/InvitePlayersModal';
 import PlayerInvitationsCard from '../components/PlayerInvitationsCard';
 import { autoSelectTeams } from '../utils/selectionAlgorithm';
+import Level from '../components/Level';
 
 export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -178,7 +179,7 @@ export default function EventDetailPage() {
                             return player ? (
                               <div key={playerId} className="text-sm text-gray-700 flex justify-between items-center gap-2">
                                 <span className="flex-1">{player.firstName} {player.lastName}</span>
-                                <span className="text-xs text-gray-500">Skill: {player.score}</span>
+                                <Level level={player.level} className="text-sm" />
                                 <button
                                   onClick={() => handleRemovePlayerFromTeam(team.id, playerId)}
                                   className="text-red-600 hover:text-red-800 text-xs"

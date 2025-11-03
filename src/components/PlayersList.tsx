@@ -1,5 +1,6 @@
 import type { Player } from '../types';
 import { useState } from 'react';
+import Level from './Level';
 
 interface PlayersListProps {
   players: Player[];
@@ -91,11 +92,9 @@ export default function PlayersList({ players, onEdit, onDelete }: PlayersListPr
                     {player.birthYear}
                   </p>
                 </div>
-                {/* Score - just the number */}
+                {/* Level - stars */}
                 <div className="ml-2 flex-shrink-0">
-                  <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-blue-600 rounded-full">
-                    {player.score}
-                  </span>
+                  <Level level={player.level} className="text-lg" />
                 </div>
               </div>
             </div>

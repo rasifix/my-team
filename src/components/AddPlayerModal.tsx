@@ -14,7 +14,7 @@ export default function AddPlayerModal({ isOpen, onClose, onSave, onUpdate, edit
     firstName: '',
     lastName: '',
     birthYear: new Date().getFullYear(),
-    score: 3
+    level: 3
   });
 
   const isEditMode = Boolean(editingPlayer);
@@ -26,14 +26,14 @@ export default function AddPlayerModal({ isOpen, onClose, onSave, onUpdate, edit
         firstName: editingPlayer.firstName,
         lastName: editingPlayer.lastName,
         birthYear: editingPlayer.birthYear,
-        score: editingPlayer.score
+        level: editingPlayer.level
       });
     } else {
       setFormData({
         firstName: '',
         lastName: '',
         birthYear: new Date().getFullYear() - 10,
-        score: 3
+        level: 3
       });
     }
   }, [editingPlayer]);
@@ -47,27 +47,25 @@ export default function AddPlayerModal({ isOpen, onClose, onSave, onUpdate, edit
         onSave(formData);
       }
       
-      // Reset form only if not editing
-      if (!isEditMode) {
-        setFormData({
-          firstName: '',
-          lastName: '',
-          birthYear: new Date().getFullYear() - 10,
-          score: 3
-        });
+        // Reset form only if not editing
+        if (!isEditMode) {
+          setFormData({
+            firstName: '',
+            lastName: '',
+            birthYear: new Date().getFullYear() - 10,
+            level: 3
+          });
+        }
       }
-    }
-  };
+    };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'birthYear' || name === 'score' ? parseInt(value) : value
+      [name]: name === 'birthYear' || name === 'level' ? parseInt(value) : value
     }));
-  };
-
-  if (!isOpen) return null;
+  };  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -140,13 +138,13 @@ export default function AddPlayerModal({ isOpen, onClose, onSave, onUpdate, edit
             </div>
 
             <div>
-              <label htmlFor="score" className="block text-sm font-medium text-gray-700 mb-1">
-                Skill Score (1-5)
+              <label htmlFor="level" className="block text-sm font-medium text-gray-700 mb-1">
+                Level (1-5)
               </label>
               <select
-                id="score"
-                name="score"
-                value={formData.score}
+                id="level"
+                name="level"
+                value={formData.level}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >

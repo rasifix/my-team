@@ -6,11 +6,12 @@ import PlayersPage from './pages/PlayersPage';
 import EventsPage from './pages/EventsPage';
 import EventDetailPage from './pages/EventDetailPage';
 import StatisticsPage from './pages/StatisticsPage';
-import { migrateMaxPlayersToEvent } from './utils/migrations';
+import { migrateScoreToLevel, migrateMaxPlayersToEvent } from './utils/migrations';
 
 function App() {
   useEffect(() => {
     // Run migrations on app startup
+    migrateScoreToLevel();
     migrateMaxPlayersToEvent();
   }, []);
 

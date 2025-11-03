@@ -3,7 +3,7 @@ export interface Player {
   firstName: string;
   lastName: string;
   birthYear: number;
-  score: number; // 1-5
+  level: number; // 1-5
 }
 
 export interface Team {
