@@ -3,17 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { useEvents } from '../hooks/useEvents';
 import EventsList from '../components/EventsList';
 import AddEventModal from '../components/AddEventModal';
-import ConfirmDialog from '../components/ConfirmDialog';
-import type { Team, Event } from '../types';
+import type { Team } from '../types';
 import { Card, CardBody, CardTitle } from '../components/ui';
 import Button from '../components/ui/Button';
 
 export default function EventsPage() {
   const navigate = useNavigate();
-  const { events, addEvent, deleteEvent } = useEvents();
+  const { events, addEvent } = useEvents();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
-  const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
 
   const handleAddEvent = (eventData: { 
     name: string; 
@@ -26,6 +23,7 @@ export default function EventsPage() {
     const teams: Team[] = Array.from({ length: eventData.numberOfTeams }, (_, index) => ({
       id: crypto.randomUUID(),
       name: `Team ${index + 1}`,
+      strength: 2, // Default strength
       selectedPlayers: [], // Players will be assigned during selection
     }));
 
@@ -47,24 +45,6 @@ export default function EventsPage() {
 
   const handleEventClick = (eventId: string) => {
     navigate(`/events/${eventId}`);
-  };
-
-  const handleDeleteEvent = (event: Event) => {
-    setEventToDelete(event);
-    setIsConfirmDialogOpen(true);
-  };
-
-  const confirmDeleteEvent = () => {
-    if (eventToDelete) {
-      deleteEvent(eventToDelete.id);
-      setEventToDelete(null);
-    }
-    setIsConfirmDialogOpen(false);
-  };
-
-  const cancelDeleteEvent = () => {
-    setEventToDelete(null);
-    setIsConfirmDialogOpen(false);
   };
 
   return (
@@ -91,7 +71,6 @@ export default function EventsPage() {
           <EventsList 
             events={events} 
             onEventClick={handleEventClick}
-            onDelete={handleDeleteEvent}
           />
         </CardBody>
       </Card>
@@ -100,17 +79,6 @@ export default function EventsPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onAdd={handleAddEvent}
-      />
-
-      <ConfirmDialog
-        isOpen={isConfirmDialogOpen}
-        title="Delete Event"
-        message={`Are you sure you want to delete "${eventToDelete?.name}"? This action cannot be undone.`}
-        confirmText="Delete"
-        cancelText="Cancel"
-        onConfirm={confirmDeleteEvent}
-        onCancel={cancelDeleteEvent}
-        confirmButtonColor="red"
       />
     </div>
   );

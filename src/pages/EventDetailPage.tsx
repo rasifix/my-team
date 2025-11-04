@@ -1,20 +1,23 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { getEventById, updateEvent, getPlayerById } from '../utils/localStorage';
+import { getEventById, updateEvent, getPlayerById, deleteEvent } from '../utils/localStorage';
 import type { Event, Invitation } from '../types';
 import InvitePlayersModal from '../components/InvitePlayersModal';
 import PlayerInvitationsCard from '../components/PlayerInvitationsCard';
 import EditTeamNameModal from '../components/EditTeamNameModal';
 import EditEventModal from '../components/EditEventModal';
+import ConfirmDialog from '../components/ConfirmDialog';
 import { autoSelectTeams } from '../utils/selectionAlgorithm';
 import Level from '../components/Level';
 
 export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [event, setEvent] = useState<Event | null>(null);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isEditTeamModalOpen, setIsEditTeamModalOpen] = useState(false);
   const [isEditEventModalOpen, setIsEditEventModalOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [editingTeam, setEditingTeam] = useState<{ id: string; name: string; strength: number } | null>(null);
   const [dragOverTeamId, setDragOverTeamId] = useState<string | null>(null);
 
@@ -84,6 +87,21 @@ export default function EventDetailPage() {
     }
 
     setIsEditEventModalOpen(false);
+  };
+
+  const handleDeleteEvent = () => {
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const confirmDeleteEvent = () => {
+    if (id) {
+      deleteEvent(id);
+      navigate('/events');
+    }
+  };
+
+  const cancelDeleteEvent = () => {
+    setIsDeleteConfirmOpen(false);
   };
 
   const handleInvitePlayers = (playerIds: string[]) => {
@@ -242,12 +260,20 @@ export default function EventDetailPage() {
               Max players: {event.maxPlayersPerTeam}
             </p>
           </div>
-          <button 
-            onClick={() => setIsEditEventModalOpen(true)}
-            className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-          >
-            Edit Event
-          </button>
+          <div className="flex gap-3">
+            <button 
+              onClick={() => setIsEditEventModalOpen(true)}
+              className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+            >
+              Edit Event
+            </button>
+            <button 
+              onClick={handleDeleteEvent}
+              className="text-red-600 hover:text-red-700 text-sm font-medium"
+            >
+              Delete Event
+            </button>
+          </div>
         </div>
       </div>
 
@@ -402,6 +428,17 @@ export default function EventDetailPage() {
           maxPlayersPerTeam: event.maxPlayersPerTeam,
         }}
         minMaxPlayers={Math.max(...event.teams.map(team => (team.selectedPlayers || []).length), 1)}
+      />
+
+      <ConfirmDialog
+        isOpen={isDeleteConfirmOpen}
+        title="Delete Event"
+        message={`Are you sure you want to delete "${event.name}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={confirmDeleteEvent}
+        onCancel={cancelDeleteEvent}
+        confirmButtonColor="red"
       />
     </div>
   );

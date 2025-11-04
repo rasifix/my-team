@@ -1,5 +1,6 @@
 import type { Player } from '../types';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Level from './Level';
 
 interface PlayersListProps {
@@ -9,6 +10,7 @@ interface PlayersListProps {
 }
 
 export default function PlayersList({ players, onEdit, onDelete }: PlayersListProps) {
+  const navigate = useNavigate();
   const [swipedPlayerId, setSwipedPlayerId] = useState<string | null>(null);
 
   if (players.length === 0) {
@@ -45,12 +47,12 @@ export default function PlayersList({ players, onEdit, onDelete }: PlayersListPr
   };
 
   const handleRowClick = (player: Player, e: React.MouseEvent) => {
-    // Don't trigger edit if clicking on delete button area
+    // Don't trigger navigation if clicking on delete button area
     const target = e.target as HTMLElement;
     if (target.closest('.delete-button')) {
       return;
     }
-    onEdit(player);
+    navigate(`/players/${player.id}`);
   };
 
   const handleDeleteClick = (player: Player, e: React.MouseEvent) => {

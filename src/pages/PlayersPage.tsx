@@ -1,59 +1,21 @@
-import { useState } from 'react';
-import AddPlayerModal from '../components/AddPlayerModal';
-import ConfirmDialog from '../components/ConfirmDialog';
-import PlayersList from '../components/PlayersList';
-import { usePlayers } from '../hooks/usePlayers';
-import { Card, CardBody, CardTitle } from '../components/ui';
-import Button from '../components/ui/Button';
+import { useState } from "react";
+import AddPlayerModal from "../components/AddPlayerModal";
+import PlayersList from "../components/PlayersList";
+import { usePlayers } from "../hooks/usePlayers";
+import { Card, CardBody, CardTitle } from "../components/ui";
+import Button from "../components/ui/Button";
 
 export default function PlayersPage() {
-  const { players, loading, error, addPlayer, updatePlayer, deletePlayer } = usePlayers();
+  const { players, loading, error, addPlayer } = usePlayers();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingPlayer, setEditingPlayer] = useState<import('../types').Player | null>(null);
-  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
-  const [playerToDelete, setPlayerToDelete] = useState<import('../types').Player | null>(null);
 
-  const handleAddPlayer = (playerData: Omit<import('../types').Player, 'id'>) => {
+  const handleAddPlayer = (
+    playerData: Omit<import("../types").Player, "id">
+  ) => {
     const success = addPlayer(playerData);
     if (success) {
       setIsModalOpen(false);
     }
-  };
-
-  const handleEditPlayer = (player: import('../types').Player) => {
-    setEditingPlayer(player);
-    setIsModalOpen(true);
-  };
-
-  const handleUpdatePlayer = (playerId: string, playerData: Omit<import('../types').Player, 'id'>) => {
-    const success = updatePlayer(playerId, playerData);
-    if (success) {
-      setIsModalOpen(false);
-      setEditingPlayer(null);
-    }
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setEditingPlayer(null);
-  };
-
-  const handleDeletePlayer = (player: import('../types').Player) => {
-    setPlayerToDelete(player);
-    setIsConfirmDialogOpen(true);
-  };
-
-  const confirmDeletePlayer = () => {
-    if (playerToDelete) {
-      deletePlayer(playerToDelete.id);
-      setPlayerToDelete(null);
-    }
-    setIsConfirmDialogOpen(false);
-  };
-
-  const cancelDeletePlayer = () => {
-    setPlayerToDelete(null);
-    setIsConfirmDialogOpen(false);
   };
 
   if (loading) {
@@ -84,43 +46,31 @@ export default function PlayersPage() {
       <Card>
         <CardBody>
           <div className="flex justify-between items-center mb-4">
-            <CardTitle>All Players</CardTitle>
-            <Button 
+            <CardTitle>
+              All Players ({players.length})
+            </CardTitle>
+            <Button
               variant="primary"
-              onClick={() => {
-                setEditingPlayer(null);
-                setIsModalOpen(true);
-              }}
+              onClick={() => setIsModalOpen(true)}
             >
               Add Player
             </Button>
           </div>
-        
+
           <PlayersList
             players={players}
-            onEdit={handleEditPlayer}
-            onDelete={handleDeletePlayer}
+            onEdit={() => {}}
+            onDelete={() => {}}
           />
         </CardBody>
       </Card>
 
       <AddPlayerModal
         isOpen={isModalOpen}
-        onClose={handleCloseModal}
+        onClose={() => setIsModalOpen(false)}
         onSave={handleAddPlayer}
-        onUpdate={handleUpdatePlayer}
-        editingPlayer={editingPlayer}
-      />
-
-      <ConfirmDialog
-        isOpen={isConfirmDialogOpen}
-        title="Delete Player"
-        message={`Are you sure you want to delete ${playerToDelete?.firstName} ${playerToDelete?.lastName}? This action cannot be undone.`}
-        confirmText="Delete"
-        cancelText="Cancel"
-        onConfirm={confirmDeletePlayer}
-        onCancel={cancelDeletePlayer}
-        confirmButtonColor="red"
+        onUpdate={() => {}}
+        editingPlayer={null}
       />
     </div>
   );

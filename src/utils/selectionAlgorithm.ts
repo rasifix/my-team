@@ -83,63 +83,101 @@ export function autoSelectTeams(event: Event): Team[] {
     return b.level - a.level; // Higher level first within same participation
   });
 
+  // Calculate total capacity and select players that fit
+  const totalCapacity = event.teams.length * event.maxPlayersPerTeam;
+  const selectedPlayers = sortedPlayers.slice(0, totalCapacity)
+    .sort((a, b) => b.level - a.level); // Sort by level descending
+
   // Initialize teams with empty selectedPlayers arrays
   const teams: Team[] = event.teams.map(team => ({
     ...team,
     selectedPlayers: [],
   }));
 
-  // Distribute players using snake draft approach
-  let teamIndex = 0;
-  let direction = 1; // 1 for forward, -1 for backward
+  // Check if teams have differing strengths
+  const uniqueStrengths = new Set(teams.map(t => t.strength || 2));
+  const hasVaryingStrengths = uniqueStrengths.size > 1 && teams.length > 1;
 
-  for (const player of sortedPlayers) {
-    // Ensure selectedPlayers is initialized
-    if (!teams[teamIndex].selectedPlayers) {
-      teams[teamIndex].selectedPlayers = [];
-    }
-    
-    // Check if team is not full
-    if (teams[teamIndex].selectedPlayers.length < event.maxPlayersPerTeam) {
-      teams[teamIndex].selectedPlayers.push(player.id);
-    } else {
-      // Find next available team with space
-      let found = false;
-      for (let i = 0; i < teams.length; i++) {
-        if (!teams[i].selectedPlayers) {
-          teams[i].selectedPlayers = [];
+  if (hasVaryingStrengths) {
+    // Assign players based on team strength
+    // Sort teams by strength (1 = highest, 3 = lowest)
+    const teamsByStrength = teams.map((team, index) => ({ team, index }))
+      .sort((a, b) => (a.team.strength || 2) - (b.team.strength || 2));
+
+    // Sort available players by level (high to low)
+    const availablePlayers = [...selectedPlayers].sort((a, b) => b.level - a.level);
+    const assignedPlayerIds = new Set<string>();
+
+    // Process each team in strength order
+    for (const { team } of teamsByStrength) {
+     
+      // Fill this team to capacity
+      while (team.selectedPlayers.length < event.maxPlayersPerTeam) {
+        let selectedPlayer: PlayerWithStats | undefined;
+
+        selectedPlayer = availablePlayers.find(p => !assignedPlayerIds.has(p.id));
+
+        if (selectedPlayer) {
+          team.selectedPlayers.push(selectedPlayer.id);
+          assignedPlayerIds.add(selectedPlayer.id);
+        } else {
+          break; // No more players available
         }
-        if (teams[i].selectedPlayers.length < event.maxPlayersPerTeam) {
-          teams[i].selectedPlayers.push(player.id);
-          found = true;
+      }
+    }
+  } else {
+    // Original snake draft approach when strengths are equal
+    let teamIndex = 0;
+    let direction = 1; // 1 for forward, -1 for backward
+
+    for (const player of selectedPlayers) {
+      // Ensure selectedPlayers is initialized
+      if (!teams[teamIndex].selectedPlayers) {
+        teams[teamIndex].selectedPlayers = [];
+      }
+      
+      // Check if team is not full
+      if (teams[teamIndex].selectedPlayers.length < event.maxPlayersPerTeam) {
+        teams[teamIndex].selectedPlayers.push(player.id);
+      } else {
+        // Find next available team with space
+        let found = false;
+        for (let i = 0; i < teams.length; i++) {
+          if (!teams[i].selectedPlayers) {
+            teams[i].selectedPlayers = [];
+          }
+          if (teams[i].selectedPlayers.length < event.maxPlayersPerTeam) {
+            teams[i].selectedPlayers.push(player.id);
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          // All teams full, skip remaining players
           break;
         }
+        continue;
       }
-      if (!found) {
-        // All teams full, skip remaining players
-        break;
+
+      // Move to next team (snake pattern)
+      if (direction === 1) {
+        teamIndex++;
+        if (teamIndex >= teams.length) {
+          teamIndex = teams.length - 1;
+          direction = -1;
+        }
+      } else {
+        teamIndex--;
+        if (teamIndex < 0) {
+          teamIndex = 0;
+          direction = 1;
+        }
       }
-      continue;
     }
 
-    // Move to next team (snake pattern)
-    if (direction === 1) {
-      teamIndex++;
-      if (teamIndex >= teams.length) {
-        teamIndex = teams.length - 1;
-        direction = -1;
-      }
-    } else {
-      teamIndex--;
-      if (teamIndex < 0) {
-        teamIndex = 0;
-        direction = 1;
-      }
-    }
+    // Balance teams by skill when strengths are equal
+    balanceTeamsBySkill(teams, playersWithStats);
   }
-
-  // Balance teams by skill
-  balanceTeamsBySkill(teams, playersWithStats);
 
   return teams;
 }
