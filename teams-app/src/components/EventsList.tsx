@@ -46,9 +46,11 @@ export default function EventsList({ events, onEventClick }: EventsListProps) {
                   <p className="text-sm text-gray-600">
                     📅 {formatDate(event.date)} at {event.startTime}
                   </p>
-                  <p className="text-sm text-gray-600">
-                    👥 {event.teams.length} {event.teams.length === 1 ? 'team' : 'teams'}
-                  </p>
+                  {event.teams.map((team) => (
+                    <p key={team.id} className="text-sm text-gray-600">
+                      👥 {team.name}: Strength {team.strength}
+                    </p>
+                  ))}
                   <p className="text-sm text-gray-600">
                     ✉️ {event.invitations.length} {event.invitations.length === 1 ? 'invitation' : 'invitations'}
                   </p>
