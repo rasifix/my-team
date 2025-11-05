@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getPlayers, getEvents } from '../utils/localStorage';
 import type { Player } from '../types';
 import Level from '../components/Level';
@@ -14,7 +15,12 @@ interface PlayerStats {
 }
 
 export default function StatisticsPage() {
+  const navigate = useNavigate();
   const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
+
+  const handlePlayerClick = (playerId: string) => {
+    navigate(`/players/${playerId}`);
+  };
 
   useEffect(() => {
     const players = getPlayers();
@@ -63,6 +69,9 @@ export default function StatisticsPage() {
 
   const totalPlayers = playerStats.length;
   const totalEvents = getEvents().length;
+  const avgAcceptances = totalPlayers > 0
+    ? playerStats.reduce((sum, stat) => sum + stat.acceptedCount, 0) / totalPlayers
+    : 0;
   const avgSelections = totalPlayers > 0
     ? playerStats.reduce((sum, stat) => sum + stat.selectedCount, 0) / totalPlayers
     : 0;
@@ -76,13 +85,17 @@ export default function StatisticsPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <SummaryCard>
           <SummaryCardContent label="Total Players" value={totalPlayers} />
         </SummaryCard>
         
         <SummaryCard>
           <SummaryCardContent label="Total Events" value={totalEvents} />
+        </SummaryCard>
+        
+        <SummaryCard>
+          <SummaryCardContent label="Avg Acceptances per Player" value={avgAcceptances.toFixed(1)} />
         </SummaryCard>
         
         <SummaryCard>
@@ -113,7 +126,11 @@ export default function StatisticsPage() {
               </thead>
               <tbody className="table-body">
                 {playerStats.map((stat) => (
-                  <tr key={stat.player.id} className="table-row">
+                  <tr 
+                    key={stat.player.id} 
+                    className="table-row cursor-pointer hover:bg-gray-50"
+                    onClick={() => handlePlayerClick(stat.player.id)}
+                  >
                     {/* Desktop view */}
                     <td className="table-cell hidden md:table-cell">
                       <div className="text-sm font-medium text-gray-900">

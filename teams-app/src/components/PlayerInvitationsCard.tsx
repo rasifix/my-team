@@ -20,6 +20,7 @@ export default function PlayerInvitationsCard({
   const acceptedCount = invitations.filter(inv => inv.status === 'accepted').length;
   const openCount = invitations.filter(inv => inv.status === 'open').length;
   const declinedCount = invitations.filter(inv => inv.status === 'declined').length;
+  const hasAnySelections = assignedPlayerIds.length > 0;
 
   return (
     <div className="bg-white shadow rounded-lg p-6">
@@ -76,11 +77,12 @@ export default function PlayerInvitationsCard({
             const isAccepted = invitation.status === 'accepted';
             const isAssigned = assignedPlayerIds.includes(invitation.playerId);
             const isDraggable = isAccepted && !isAssigned;
+            const shouldDim = hasAnySelections && (invitation.status === 'declined' || invitation.status === 'open' || isAssigned);
             
             return (
               <div 
                 key={invitation.id} 
-                className={`border border-gray-200 rounded-lg p-3 ${isDraggable ? 'cursor-move' : ''}`}
+                className={`border border-gray-200 rounded-lg p-3 ${isDraggable ? 'cursor-move' : ''} ${shouldDim ? 'opacity-40' : ''}`}
                 draggable={isDraggable}
                 onDragStart={(e) => {
                   if (isDraggable) {

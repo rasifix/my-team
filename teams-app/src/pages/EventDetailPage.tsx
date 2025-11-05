@@ -9,6 +9,7 @@ import EditEventModal from '../components/EditEventModal';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { autoSelectTeams } from '../utils/selectionAlgorithm';
 import Level from '../components/Level';
+import Strength from '../components/Strength';
 
 export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -20,6 +21,7 @@ export default function EventDetailPage() {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [editingTeam, setEditingTeam] = useState<{ id: string; name: string; strength: number } | null>(null);
   const [dragOverTeamId, setDragOverTeamId] = useState<string | null>(null);
+  const [dragOverPlayerId, setDragOverPlayerId] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -193,14 +195,14 @@ export default function EventDetailPage() {
     }
   };
 
-  const handleAddPlayerToTeam = (teamId: string, playerId: string) => {
+  const handleAddPlayerToTeam = (teamId: string, playerId: string, allowMove: boolean = false) => {
     if (!event || !id) return;
 
     // Check if player is already assigned to any team
     const isAlreadyAssigned = event.teams.some(team => 
       (team.selectedPlayers || []).includes(playerId)
     );
-    if (isAlreadyAssigned) return;
+    if (isAlreadyAssigned && !allowMove) return;
 
     const updatedTeams = event.teams.map(team => {
       if (team.id === teamId) {
@@ -212,6 +214,41 @@ export default function EventDetailPage() {
         return {
           ...team,
           selectedPlayers: [...currentPlayers, playerId],
+        };
+      }
+      return team;
+    });
+
+    const success = updateEvent(id, { teams: updatedTeams });
+
+    if (success) {
+      setEvent({
+        ...event,
+        teams: updatedTeams,
+      });
+    }
+  };
+
+  const handleSwitchPlayers = (sourceTeamId: string, sourcePlayerId: string, targetTeamId: string, targetPlayerId: string) => {
+    if (!event || !id || sourceTeamId === targetTeamId) return;
+
+    const updatedTeams = event.teams.map(team => {
+      if (team.id === sourceTeamId) {
+        // Replace source player with target player
+        return {
+          ...team,
+          selectedPlayers: (team.selectedPlayers || []).map(pId => 
+            pId === sourcePlayerId ? targetPlayerId : pId
+          ),
+        };
+      }
+      if (team.id === targetTeamId) {
+        // Replace target player with source player
+        return {
+          ...team,
+          selectedPlayers: (team.selectedPlayers || []).map(pId => 
+            pId === targetPlayerId ? sourcePlayerId : pId
+          ),
         };
       }
       return team;
@@ -324,15 +361,29 @@ export default function EventDetailPage() {
                       
                       if (!hasCapacity) return;
                       
+                      // Check if it's a player from invitations list
                       const playerId = e.dataTransfer.getData('playerId');
                       if (playerId) {
                         handleAddPlayerToTeam(team.id, playerId);
+                        return;
+                      }
+                      
+                      // Check if it's a selected player from another team
+                      const selectedPlayerId = e.dataTransfer.getData('selectedPlayerId');
+                      const sourceTeamId = e.dataTransfer.getData('sourceTeamId');
+                      
+                      if (selectedPlayerId && sourceTeamId && sourceTeamId !== team.id) {
+                        // Move player from source team to target team
+                        handleRemovePlayerFromTeam(sourceTeamId, selectedPlayerId);
+                        handleAddPlayerToTeam(team.id, selectedPlayerId, true);
                       }
                     }}
                   >
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <h3 className="font-semibold text-gray-900">{team.name}</h3>
+                        <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+                          {team.name} <Strength level={team.strength || 2} />
+                        </h3>
                         <p className="text-sm text-gray-600">
                           Selected: {selectedPlayers.length}/{event.maxPlayersPerTeam}
                         </p>
@@ -357,8 +408,42 @@ export default function EventDetailPage() {
                               return a.player.firstName.toLowerCase().localeCompare(b.player.firstName.toLowerCase());
                             })
                             .map(({ playerId, player }) => {
+                            const isDragOver = dragOverPlayerId === playerId;
                             return player ? (
-                              <div key={playerId} className="text-sm text-gray-700 flex justify-between items-center gap-2">
+                              <div 
+                                key={playerId} 
+                                className={`text-sm text-gray-700 flex justify-between items-center gap-2 p-1 rounded cursor-move transition-colors ${
+                                  isDragOver ? 'bg-blue-100 border border-blue-400' : 'hover:bg-gray-50'
+                                }`}
+                                draggable={true}
+                                onDragStart={(e) => {
+                                  e.dataTransfer.effectAllowed = 'move';
+                                  e.dataTransfer.setData('selectedPlayerId', playerId);
+                                  e.dataTransfer.setData('sourceTeamId', team.id);
+                                }}
+                                onDragOver={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  e.dataTransfer.dropEffect = 'move';
+                                  setDragOverPlayerId(playerId);
+                                }}
+                                onDragLeave={(e) => {
+                                  e.stopPropagation();
+                                  setDragOverPlayerId(null);
+                                }}
+                                onDrop={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setDragOverPlayerId(null);
+                                  
+                                  const draggedPlayerId = e.dataTransfer.getData('selectedPlayerId');
+                                  const sourceTeamId = e.dataTransfer.getData('sourceTeamId');
+                                  
+                                  if (draggedPlayerId && sourceTeamId && draggedPlayerId !== playerId) {
+                                    handleSwitchPlayers(sourceTeamId, draggedPlayerId, team.id, playerId);
+                                  }
+                                }}
+                              >
                                 <span className="flex-1">{player.firstName} {player.lastName}</span>
                                 <Level level={player.level} className="text-sm" />
                                 <button

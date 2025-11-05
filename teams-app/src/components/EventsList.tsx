@@ -1,4 +1,5 @@
 import type { Event } from '../types';
+import Strength from './Strength';
 
 interface EventsListProps {
   events: Event[];
@@ -47,8 +48,8 @@ export default function EventsList({ events, onEventClick }: EventsListProps) {
                     📅 {formatDate(event.date)} at {event.startTime}
                   </p>
                   {event.teams.map((team) => (
-                    <p key={team.id} className="text-sm text-gray-600">
-                      👥 {team.name}: Strength {team.strength}
+                    <p key={team.id} className="text-sm text-gray-600 flex items-center gap-1">
+                      👥 {team.name} <Strength level={team.strength} />
                     </p>
                   ))}
                   <p className="text-sm text-gray-600">

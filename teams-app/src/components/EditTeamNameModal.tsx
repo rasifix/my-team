@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Modal, ModalHeader, ModalTitle, ModalBody, ModalFooter } from './ui';
 import Button from './ui/Button';
+import Strength from './Strength';
 
 interface EditTeamNameModalProps {
   isOpen: boolean;
@@ -68,9 +69,9 @@ export default function EditTeamNameModal({
                 onChange={(e) => setStrength(parseInt(e.target.value))}
                 className="form-input"
               >
-                <option value={1}>1 - Highest</option>
-                <option value={2}>2 - Medium</option>
-                <option value={3}>3 - Lowest</option>
+                <option value={1}>1 - Highest 🔥🔥🔥</option>
+                <option value={2}>2 - Medium 🔥🔥</option>
+                <option value={3}>3 - Lowest 🔥</option>
               </select>
             </div>
           </div>

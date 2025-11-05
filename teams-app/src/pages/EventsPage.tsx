@@ -49,13 +49,6 @@ export default function EventsPage() {
 
   return (
     <div className="page-container">
-      <div className="page-header">
-        <h1 className="page-title">Events</h1>
-        <p className="page-subtitle">
-          View and manage soccer events and team selections.
-        </p>
-      </div>
-
       <Card>
         <CardBody>
           <div className="flex justify-between items-center mb-4">

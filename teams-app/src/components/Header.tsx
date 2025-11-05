@@ -15,7 +15,7 @@ export default function Header() {
   ];
 
   return (
-    <header className="bg-blue-600 text-white shadow-md">
+    <header className="bg-orange-600 text-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo/Title */}
@@ -31,8 +31,8 @@ export default function Header() {
                 to={item.path}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   location.pathname === item.path
-                    ? 'bg-blue-700 text-white'
-                    : 'text-blue-100 hover:bg-blue-500 hover:text-white'
+                    ? 'bg-orange-700 text-white'
+                    : 'text-orange-100 hover:bg-orange-500 hover:text-white'
                 }`}
               >
                 {item.label}
@@ -40,7 +40,7 @@ export default function Header() {
             ))}
             <button
               onClick={handleExport}
-              className="px-3 py-2 rounded-md text-sm font-medium text-blue-100 hover:bg-blue-500 hover:text-white transition-colors flex items-center gap-1"
+              className="px-3 py-2 rounded-md text-sm font-medium text-orange-100 hover:bg-orange-500 hover:text-white transition-colors flex items-center gap-1"
               title="Export data"
             >
               <svg
@@ -65,7 +65,7 @@ export default function Header() {
           <div className="md:hidden">
             <button
               type="button"
-              className="bg-blue-700 inline-flex items-center justify-center p-2 rounded-md text-blue-200 hover:text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+              className="bg-orange-700 inline-flex items-center justify-center p-2 rounded-md text-orange-200 hover:text-white hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
               aria-controls="mobile-menu"
               aria-expanded="false"
             >
@@ -98,33 +98,13 @@ export default function Header() {
                 to={item.path}
                 className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
                   location.pathname === item.path
-                    ? 'bg-blue-700 text-white'
-                    : 'text-blue-100 hover:bg-blue-500 hover:text-white'
+                    ? 'bg-orange-700 text-white'
+                    : 'text-orange-100 hover:bg-orange-500 hover:text-white'
                 }`}
               >
                 {item.label}
               </Link>
             ))}
-            <button
-              onClick={handleExport}
-              className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-blue-100 hover:bg-blue-500 hover:text-white transition-colors flex items-center gap-2"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                />
-              </svg>
-              Export Data
-            </button>
           </div>
         </div>
       </div>
