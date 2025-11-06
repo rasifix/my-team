@@ -1,8 +1,9 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { Player, Event } from '../types';
 import { Card, CardBody, CardTitle } from './ui';
 import { formatDate } from '../utils/dateFormatter';
+import PlayerLevelFilter from './PlayerLevelFilter';
 
 interface EventAttendanceMatrixProps {
   players: Player[];
@@ -10,8 +11,21 @@ interface EventAttendanceMatrixProps {
 }
 
 export default function EventAttendanceMatrix({ players, events }: EventAttendanceMatrixProps) {
+  const [minLevel, setMinLevel] = useState<number>(1);
+  const [maxLevel, setMaxLevel] = useState<number>(5);
+
+  const handleReset = () => {
+    setMinLevel(1);
+    setMaxLevel(5);
+  };
+
   const attendanceData = useMemo(() => {
-    return players.map(player => {
+    // Filter players by level range
+    const filteredPlayers = players.filter(player => 
+      player.level >= minLevel && player.level <= maxLevel
+    );
+
+    return filteredPlayers.map(player => {
       const attendance = events.map(event => {
         const invitation = event.invitations.find(inv => inv.playerId === player.id);
         const isSelected = event.teams.some(team => 
@@ -35,7 +49,7 @@ export default function EventAttendanceMatrix({ players, events }: EventAttendan
 
       return { player, attendance };
     });
-  }, [players, events]);
+  }, [players, events, minLevel, maxLevel]);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -75,6 +89,17 @@ export default function EventAttendanceMatrix({ players, events }: EventAttendan
   return (
     <Card>
       <CardBody>
+        <CardTitle>Event Attendance Matrix</CardTitle>
+        
+        {/* Level Filter */}
+        <PlayerLevelFilter
+          minLevel={minLevel}
+          maxLevel={maxLevel}
+          onMinLevelChange={setMinLevel}
+          onMaxLevelChange={setMaxLevel}
+          onReset={handleReset}
+        />
+
         <div className="mt-4 text-xs text-gray-600 mb-4 flex flex-wrap gap-4">
           <div className="flex items-center gap-1">
             <span className="text-green-600 font-bold">✓</span>
