@@ -3,7 +3,7 @@ import { Modal, ModalHeader, ModalTitle, ModalBody, ModalFooter } from './ui';
 import Button from './ui/Button';
 import Strength from './Strength';
 
-interface EditTeamNameModalProps {
+interface EditTeamModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (name: string, strength: number) => void;
@@ -11,13 +11,13 @@ interface EditTeamNameModalProps {
   currentStrength: number;
 }
 
-export default function EditTeamNameModal({ 
+export default function EditTeamModal({ 
   isOpen, 
   onClose, 
   onSave, 
   currentName,
   currentStrength
-}: EditTeamNameModalProps) {
+}: EditTeamModalProps) {
   const [teamName, setTeamName] = useState(currentName);
   const [strength, setStrength] = useState(currentStrength);
 

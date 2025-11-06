@@ -4,7 +4,7 @@ import { getEventById, updateEvent, getPlayerById, deleteEvent } from '../utils/
 import type { Event, Invitation } from '../types';
 import InvitePlayersModal from '../components/InvitePlayersModal';
 import PlayerInvitationsCard from '../components/PlayerInvitationsCard';
-import EditTeamNameModal from '../components/EditTeamNameModal';
+import EditTeamModal from '../components/EditTeamModal';
 import EditEventModal from '../components/EditEventModal';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { autoSelectTeams } from '../utils/selectionAlgorithm';
@@ -494,7 +494,7 @@ export default function EventDetailPage() {
         alreadyInvitedPlayerIds={event.invitations.map(inv => inv.playerId)}
       />
 
-      <EditTeamNameModal
+      <EditTeamModal
         isOpen={isEditTeamModalOpen}
         onClose={() => setIsEditTeamModalOpen(false)}
         onSave={handleSaveTeamName}
