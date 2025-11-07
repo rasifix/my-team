@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { Player } from '../types';
 import Level from './Level';
+import LevelRangeSelector from './LevelRangeSelector';
 
 interface InvitePlayersModalProps {
   isOpen: boolean;
@@ -18,14 +19,12 @@ export default function InvitePlayersModal({
   players
 }: InvitePlayersModalProps) {
   const [selectedPlayerIds, setSelectedPlayerIds] = useState<Set<string>>(new Set());
-  const [minLevel, setMinLevel] = useState<number>(1);
-  const [maxLevel, setMaxLevel] = useState<number>(5);
+  const [levelRange, setLevelRange] = useState<[number, number]>([1, 5]);
 
   useEffect(() => {
     if (isOpen) {
       setSelectedPlayerIds(new Set());
-      setMinLevel(1);
-      setMaxLevel(5);
+      setLevelRange([1, 5]);
     }
   }, [isOpen]);
 
@@ -44,7 +43,7 @@ export default function InvitePlayersModal({
   const handleSelectAll = () => {
     const availablePlayerIds = players
       .filter(p => !alreadyInvitedPlayerIds.includes(p.id))
-      .filter(p => p.level >= minLevel && p.level <= maxLevel)
+      .filter(p => p.level >= levelRange[0] && p.level <= levelRange[1])
       .map(p => p.id);
     setSelectedPlayerIds(new Set(availablePlayerIds));
   };
@@ -72,7 +71,7 @@ export default function InvitePlayersModal({
 
   const availablePlayers = players
     .filter(p => !alreadyInvitedPlayerIds.includes(p.id))
-    .filter(p => p.level >= minLevel && p.level <= maxLevel);
+    .filter(p => p.level >= levelRange[0] && p.level <= levelRange[1]);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -86,6 +85,14 @@ export default function InvitePlayersModal({
         
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
           <div className="flex-1 overflow-y-auto p-6">
+                <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <LevelRangeSelector
+                    minLevel={1}
+                    maxLevel={5}
+                    defaultRange={levelRange}
+                    onChange={setLevelRange}
+                  />
+                </div>
             {availablePlayers.length === 0 ? (
               <div className="text-gray-500 text-center py-8">
                 <p>No players available to invite.</p>
@@ -93,60 +100,6 @@ export default function InvitePlayersModal({
               </div>
             ) : (
               <>
-                <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
-                    Filter by Level
-                  </label>
-                  <div className="flex items-center gap-4">
-                    <div className="flex-1">
-                      <label htmlFor="minLevel" className="block text-xs text-gray-600 mb-1">
-                        Min Level
-                      </label>
-                      <select
-                        id="minLevel"
-                        value={minLevel}
-                        onChange={(e) => {
-                          const newMin = parseInt(e.target.value);
-                          setMinLevel(newMin);
-                          if (newMin > maxLevel) {
-                            setMaxLevel(newMin);
-                          }
-                        }}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                      >
-                        <option value={1}>1 ★</option>
-                        <option value={2}>2 ★</option>
-                        <option value={3}>3 ★</option>
-                        <option value={4}>4 ★</option>
-                        <option value={5}>5 ★</option>
-                      </select>
-                    </div>
-                    <div className="flex-1">
-                      <label htmlFor="maxLevel" className="block text-xs text-gray-600 mb-1">
-                        Max Level
-                      </label>
-                      <select
-                        id="maxLevel"
-                        value={maxLevel}
-                        onChange={(e) => {
-                          const newMax = parseInt(e.target.value);
-                          setMaxLevel(newMax);
-                          if (newMax < minLevel) {
-                            setMinLevel(newMax);
-                          }
-                        }}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                      >
-                        <option value={1}>1 ★</option>
-                        <option value={2}>2 ★</option>
-                        <option value={3}>3 ★</option>
-                        <option value={4}>4 ★</option>
-                        <option value={5}>5 ★</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
                 <div className="flex gap-2 mb-4">
                   <button
                     type="button"
