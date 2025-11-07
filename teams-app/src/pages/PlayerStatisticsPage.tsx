@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { getPlayers, getEvents } from '../utils/localStorage';
 import type { Player } from '../types';
 import PlayerStatisticsTable from '../components/PlayerStatisticsTable';
+import { useEvents } from '../hooks/useEvents';
+import { usePlayers } from '../hooks/usePlayers';
 
 interface PlayerStats {
   player: Player;
@@ -15,10 +17,10 @@ interface PlayerStats {
 export default function PlayerStatisticsPage() {
   const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
 
-  useEffect(() => {
-    const players = getPlayers();
-    const events = getEvents();
+  const { events } = useEvents();
+  const { players } = usePlayers();
 
+  useEffect(() => {
     const stats: PlayerStats[] = players.map(player => {
       // Count invitations
       const invitedCount = events.filter(event =>

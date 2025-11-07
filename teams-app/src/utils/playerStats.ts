@@ -1,4 +1,3 @@
-import { getEvents } from './localStorage';
 import type { Event } from '../types';
 
 export interface PlayerStats {
@@ -6,8 +5,7 @@ export interface PlayerStats {
   selectedCount: number;
 }
 
-export function getPlayerStats(playerId: string): PlayerStats {
-  const events = getEvents();
+export function getPlayerStats(playerId: string, events: Event[]): PlayerStats {
   let acceptedCount = 0;
   let selectedCount = 0;
 

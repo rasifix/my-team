@@ -3,6 +3,7 @@ import { getPlayerStats } from '../utils/playerStats';
 import type { Team } from '../types';
 import Level from './Level';
 import Strength from './Strength';
+import { useEvents } from '../hooks/useEvents';
 
 interface TeamCardProps {
   team: Team;
@@ -31,6 +32,8 @@ export default function TeamCard({
 }: TeamCardProps) {
   const selectedPlayers = team.selectedPlayers || [];
   const hasCapacity = selectedPlayers.length < maxPlayersPerTeam;
+
+  const { events } = useEvents();
 
   return (
     <div 
@@ -102,7 +105,7 @@ export default function TeamCard({
               })
               .map(({ playerId, player }) => {
               const isDragOverPlayer = dragOverPlayerId === playerId;
-              const stats = getPlayerStats(playerId);
+              const stats = getPlayerStats(playerId, events);
               return player ? (
                 <div 
                   key={playerId} 

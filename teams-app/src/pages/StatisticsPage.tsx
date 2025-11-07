@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { getPlayers, getEvents } from '../utils/localStorage';
+import { useEvents } from '../hooks/useEvents';
+import { usePlayers } from '../hooks/usePlayers';
 import type { Player } from '../types';
 import { SummaryCard, SummaryCardContent } from '../components/ui';
 
@@ -17,11 +18,11 @@ export default function StatisticsPage() {
   const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
   const location = useLocation();
   const navigate = useNavigate();
+  
+  const { events } = useEvents();
+  const { players } = usePlayers();
 
   useEffect(() => {
-    const players = getPlayers();
-    const events = getEvents();
-
     const stats: PlayerStats[] = players.map(player => {
       // Count invitations
       const invitedCount = events.filter(event =>
@@ -61,7 +62,7 @@ export default function StatisticsPage() {
     });
 
     setPlayerStats(stats);
-  }, []);
+  }, [players, events]);
 
   // Redirect to player-statistics if on base /statistics route
   useEffect(() => {
@@ -71,7 +72,7 @@ export default function StatisticsPage() {
   }, [location.pathname, navigate]);
 
   const totalPlayers = playerStats.length;
-  const totalEvents = getEvents().length;
+  const totalEvents = events.length;
   const avgAcceptances = totalPlayers > 0
     ? playerStats.reduce((sum, stat) => sum + stat.acceptedCount, 0) / totalPlayers
     : 0;
