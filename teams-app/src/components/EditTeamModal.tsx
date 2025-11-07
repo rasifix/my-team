@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Modal, ModalHeader, ModalTitle, ModalBody, ModalFooter } from './ui';
 import Button from './ui/Button';
-import Strength from './Strength';
 
 interface EditTeamModalProps {
   isOpen: boolean;

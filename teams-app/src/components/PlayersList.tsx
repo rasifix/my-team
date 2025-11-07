@@ -9,7 +9,7 @@ interface PlayersListProps {
   onDelete: (player: Player) => void;
 }
 
-export default function PlayersList({ players, onEdit, onDelete }: PlayersListProps) {
+export default function PlayersList({ players, onDelete }: PlayersListProps) {
   const navigate = useNavigate();
   const [swipedPlayerId, setSwipedPlayerId] = useState<string | null>(null);
 
