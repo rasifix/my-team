@@ -86,14 +86,12 @@ export default function TeamPrintSummary({ event, teams, isOpen, onClose }: Team
                       <div className="space-y-2">
                         {playersData.map((player) => {
                           const shirtAssignment = team.shirtAssignments?.find(a => a.playerId === player!.id);
-                          const shirtNumber = shirtAssignment && shirtSet 
-                            ? shirtSet.shirts.find(s => s.id === shirtAssignment.shirtId)?.number 
-                            : null;
+                          const shirtNumber = shirtAssignment?.shirtNumber;
                           
                           return (
                             <div key={player!.id} className="border-b border-gray-100 pb-1 relative">
                                 <div className="flex items-center justify-center">
-                                  {shirtNumber && (
+                                  {shirtNumber && shirtNumber > 0 && (
                                     <span className="absolute left-0 text-blue-600 text-sm font-medium">#{shirtNumber}</span>
                                   )}
                                   <p className="text-sm font-medium text-gray-900">

@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useEffect } from 'react';
-import { migrateStartTimeToTeam } from './utils/migrations';
+import { migrateStartTimeToTeam, migrateShirtAssignments } from './utils/migrations';
 import Header from './components/Header';
 import HomePage from './pages/HomePage';
 import PlayersPage from './pages/PlayersPage';
@@ -17,6 +17,7 @@ function App() {
   // Run data migrations on app startup
   useEffect(() => {
     migrateStartTimeToTeam();
+    migrateShirtAssignments();
   }, []);
 
   return (

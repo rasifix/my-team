@@ -96,7 +96,7 @@ export default function EventDetailPage() {
     setIsAssignShirtsModalOpen(true);
   };
 
-  const handleSaveShirtAssignments = async (shirtSetId: string, playerShirtAssignments: Array<{ playerId: string; shirtId: string }>) => {
+  const handleSaveShirtAssignments = async (shirtSetId: string, playerShirtAssignments: Array<{ playerId: string; shirtNumber: number }>) => {
     if (!event || !id || !assigningShirtsTeam) return;
 
     // Update the team with the new shirt set and individual shirt assignments

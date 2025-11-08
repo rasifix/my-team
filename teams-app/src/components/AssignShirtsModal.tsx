@@ -9,10 +9,10 @@ import { getPlayerById } from '../services/playerService';
 interface AssignShirtsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (shirtSetId: string, playerShirtAssignments: Array<{ playerId: string; shirtId: string }>) => void;
+  onSave: (shirtSetId: string, playerShirtAssignments: Array<{ playerId: string; shirtNumber: number }>) => void;
   team: Team;
   currentShirtSetId?: string;
-  currentShirtAssignments?: Array<{ playerId: string; shirtId: string }>;
+  currentShirtAssignments?: Array<{ playerId: string; shirtNumber: number }>;
 }
 
 export default function AssignShirtsModal({
@@ -25,7 +25,7 @@ export default function AssignShirtsModal({
 }: AssignShirtsModalProps) {
   const [selectedShirtSetId, setSelectedShirtSetId] = useState<string>(currentShirtSetId || '');
   const [selectedShirtSet, setSelectedShirtSet] = useState<ShirtSet | null>(null);
-  const [playerShirtAssignments, setPlayerShirtAssignments] = useState<Array<{ playerId: string; shirtId: string }>>([]);
+  const [playerShirtAssignments, setPlayerShirtAssignments] = useState<Array<{ playerId: string; shirtNumber: number }>>([]);
 
   const { shirtSets } = useShirtSets();
 
@@ -43,7 +43,7 @@ export default function AssignShirtsModal({
         const existingAssignment = currentShirtAssignments?.find(a => a.playerId === playerId);
         return {
           playerId,
-          shirtId: existingAssignment?.shirtId || ''
+          shirtNumber: existingAssignment?.shirtNumber || 0
         };
       });
       setPlayerShirtAssignments(initialAssignments);
@@ -61,23 +61,23 @@ export default function AssignShirtsModal({
       return;
     }
 
-    onSave(selectedShirtSetId, playerShirtAssignments.filter(assignment => assignment.shirtId));
+    onSave(selectedShirtSetId, playerShirtAssignments.filter(assignment => assignment.shirtNumber > 0));
     onClose();
   };
 
-  const handleShirtAssignment = (playerId: string, shirtId: string) => {
+  const handleShirtAssignment = (playerId: string, shirtNumber: number) => {
     setPlayerShirtAssignments(prev => 
       prev.map(assignment => 
         assignment.playerId === playerId 
-          ? { ...assignment, shirtId }
+          ? { ...assignment, shirtNumber }
           : assignment
       )
     );
   };
 
-  const isShirtAssigned = (shirtId: string, currentPlayerId: string) => {
+  const isShirtAssigned = (shirtNumber: number, currentPlayerId: string) => {
     return playerShirtAssignments.some(assignment => 
-      assignment.shirtId === shirtId && assignment.playerId !== currentPlayerId
+      assignment.shirtNumber === shirtNumber && assignment.playerId !== currentPlayerId && assignment.shirtNumber > 0
     );
   };
 
@@ -126,16 +126,16 @@ export default function AssignShirtsModal({
                         </div>
                         <div className="w-32">
                           <select
-                            value={currentAssignment?.shirtId || ''}
-                            onChange={(e) => handleShirtAssignment(playerId, e.target.value)}
+                            value={currentAssignment?.shirtNumber || 0}
+                            onChange={(e) => handleShirtAssignment(playerId, parseInt(e.target.value) || 0)}
                             className="form-input w-full text-sm py-1"
                           >
-                            <option value="">No shirt</option>
+                            <option value={0}>No shirt</option>
                             {selectedShirtSet.shirts.map(shirt => (
                               <option 
-                                key={shirt.id} 
-                                value={shirt.id}
-                                disabled={isShirtAssigned(shirt.id, playerId)}
+                                key={shirt.number} 
+                                value={shirt.number}
+                                disabled={isShirtAssigned(shirt.number, playerId)}
                               >
                                 #{shirt.number} {shirt.size} {shirt.isGoalkeeper ? '(GK)' : ''}
                               </option>

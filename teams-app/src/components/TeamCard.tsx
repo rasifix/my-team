@@ -169,13 +169,11 @@ export default function TeamCard({
                     {(() => {
                       // Get shirt number if assigned
                       const shirtAssignment = team.shirtAssignments?.find(a => a.playerId === playerId);
-                      const shirtNumber = shirtAssignment && team.shirtSetId 
-                        ? getShirtSetById(team.shirtSetId)?.shirts.find(s => s.id === shirtAssignment.shirtId)?.number 
-                        : null;
+                      const shirtNumber = shirtAssignment?.shirtNumber;
                       
                       return (
                         <>
-                          {shirtNumber && <span className="text-blue-600 font-mono text-xs mr-1">#{shirtNumber}</span>}
+                          {shirtNumber && shirtNumber > 0 && <span className="text-gray-800 text-xs mr-1 font-extrabold">{shirtNumber}</span>}
                           {player.firstName} {player.lastName}
                         </>
                       );

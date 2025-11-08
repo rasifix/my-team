@@ -56,7 +56,7 @@ export function getShirtSetById(id: string): ShirtSet | null {
 }
 
 // Helper function to add a shirt to a shirt set
-export async function addShirtToSet(shirtSetId: string, shirtData: Omit<Shirt, 'id'>): Promise<Shirt> {
+export async function addShirtToSet(shirtSetId: string, shirtData: Shirt): Promise<Shirt> {
   return new Promise((resolve, reject) => {
     const shirtSet = localStorage.getShirtSetById(shirtSetId);
     if (!shirtSet) {
@@ -66,7 +66,6 @@ export async function addShirtToSet(shirtSetId: string, shirtData: Omit<Shirt, '
 
     const newShirt: Shirt = {
       ...shirtData,
-      id: crypto.randomUUID(),
     };
 
     const updatedShirts = [...shirtSet.shirts, newShirt];
@@ -81,7 +80,7 @@ export async function addShirtToSet(shirtSetId: string, shirtData: Omit<Shirt, '
 }
 
 // Helper function to remove a shirt from a shirt set
-export async function removeShirtFromSet(shirtSetId: string, shirtId: string): Promise<void> {
+export async function removeShirtFromSet(shirtSetId: string, shirtNumber: number): Promise<void> {
   return new Promise((resolve, reject) => {
     const shirtSet = localStorage.getShirtSetById(shirtSetId);
     if (!shirtSet) {
@@ -89,7 +88,7 @@ export async function removeShirtFromSet(shirtSetId: string, shirtId: string): P
       return;
     }
 
-    const updatedShirts = shirtSet.shirts.filter(shirt => shirt.id !== shirtId);
+    const updatedShirts = shirtSet.shirts.filter(shirt => shirt.number !== shirtNumber);
     const success = localStorage.updateShirtSet(shirtSetId, { shirts: updatedShirts });
     
     if (success) {
@@ -110,7 +109,7 @@ export async function updateShirt(shirtSetId: string, updatedShirt: Shirt): Prom
     }
 
     const updatedShirts = shirtSet.shirts.map(shirt => 
-      shirt.id === updatedShirt.id ? updatedShirt : shirt
+      shirt.number === updatedShirt.number ? updatedShirt : shirt
     );
     const success = localStorage.updateShirtSet(shirtSetId, { shirts: updatedShirts });
     

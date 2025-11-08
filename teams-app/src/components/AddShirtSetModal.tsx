@@ -39,7 +39,6 @@ export default function AddShirtSetModal({ onClose, onSubmit }: AddShirtSetModal
           }
           
           shirts.push({
-            id: crypto.randomUUID(),
             number: num,
             size: shirtOptions.size,
             isGoalkeeper: false
@@ -49,7 +48,6 @@ export default function AddShirtSetModal({ onClose, onSubmit }: AddShirtSetModal
         // Add goalkeeper shirt if requested
         if (shirtOptions.includeGoalkeeper) {
           shirts.push({
-            id: crypto.randomUUID(),
             number: shirtOptions.goalkeeperNumber,
             size: shirtOptions.size,
             isGoalkeeper: true

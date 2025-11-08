@@ -5,7 +5,7 @@ import Button from './ui/Button';
 
 interface AddShirtModalProps {
   onClose: () => void;
-  onSubmit: (shirtData: Omit<Shirt, 'id'>) => void;
+  onSubmit: (shirtData: Shirt) => void;
   existingNumbers: number[];
 }
 
