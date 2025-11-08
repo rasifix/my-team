@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Modal, ModalHeader, ModalTitle, ModalBody, ModalFooter } from './ui';
 import Button from './ui/Button';
+import { useTrainers } from '../hooks/useTrainers';
 
 interface EditTeamModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (name: string, strength: number) => void;
+  onSave: (name: string, strength: number, trainerId?: string) => void;
   currentName: string;
   currentStrength: number;
+  currentTrainerId?: string;
 }
 
 export default function EditTeamModal({ 
@@ -15,20 +17,24 @@ export default function EditTeamModal({
   onClose, 
   onSave, 
   currentName,
-  currentStrength
+  currentStrength,
+  currentTrainerId
 }: EditTeamModalProps) {
   const [teamName, setTeamName] = useState(currentName);
   const [strength, setStrength] = useState(currentStrength);
+  const [trainerId, setTrainerId] = useState(currentTrainerId || '');
+  const { trainers } = useTrainers();
 
   useEffect(() => {
     setTeamName(currentName);
     setStrength(currentStrength);
-  }, [currentName, currentStrength, isOpen]);
+    setTrainerId(currentTrainerId || '');
+  }, [currentName, currentStrength, currentTrainerId, isOpen]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (teamName.trim()) {
-      onSave(teamName.trim(), strength);
+      onSave(teamName.trim(), strength, trainerId || undefined);
       onClose();
     }
   };
@@ -71,6 +77,25 @@ export default function EditTeamModal({
                 <option value={1}>1 - Highest 🔥🔥🔥</option>
                 <option value={2}>2 - Medium 🔥🔥</option>
                 <option value={3}>3 - Lowest 🔥</option>
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="trainer" className="form-label">
+                Trainer
+              </label>
+              <select
+                id="trainer"
+                value={trainerId}
+                onChange={(e) => setTrainerId(e.target.value)}
+                className="form-input"
+              >
+                <option value="">No trainer assigned</option>
+                {trainers.map(trainer => (
+                  <option key={trainer.id} value={trainer.id}>
+                    {trainer.firstName} {trainer.lastName}
+                  </option>
+                ))}
               </select>
             </div>
           </div>

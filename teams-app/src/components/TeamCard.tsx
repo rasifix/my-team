@@ -1,4 +1,5 @@
 import { getPlayerById } from '../services/playerService';
+import { getTrainerById } from '../services/trainerService';
 import { getPlayerStats } from '../utils/playerStats';
 import type { Team } from '../types';
 import Level from './Level';
@@ -10,7 +11,7 @@ interface TeamCardProps {
   maxPlayersPerTeam: number;
   isDragOver: boolean;
   dragOverPlayerId: string | null;
-  onEditTeam: (teamId: string, currentName: string, currentStrength: number) => void;
+  onEditTeam: (teamId: string, currentName: string, currentStrength: number, currentTrainerId?: string) => void;
   onRemovePlayer: (teamId: string, playerId: string) => void;
   onSwitchPlayers: (sourceTeamId: string, sourcePlayerId: string, targetTeamId: string, targetPlayerId: string) => void;
   onAddPlayerToTeam: (teamId: string, playerId: string, allowMove?: boolean) => void;
@@ -32,6 +33,7 @@ export default function TeamCard({
 }: TeamCardProps) {
   const selectedPlayers = team.selectedPlayers || [];
   const hasCapacity = selectedPlayers.length < maxPlayersPerTeam;
+  const trainer = team.trainerId ? getTrainerById(team.trainerId) : null;
 
   const { events } = useEvents();
 
@@ -83,9 +85,14 @@ export default function TeamCard({
           <p className="text-sm text-gray-600">
             Selected: {selectedPlayers.length}/{maxPlayersPerTeam}
           </p>
+          {trainer && (
+            <p className="text-sm text-blue-600">
+              👨‍🏫 {trainer.firstName} {trainer.lastName}
+            </p>
+          )}
         </div>
         <button 
-          onClick={() => onEditTeam(team.id, team.name, team.strength || 2)}
+          onClick={() => onEditTeam(team.id, team.name, team.strength || 2, team.trainerId)}
           className="text-blue-600 hover:text-blue-700 text-sm"
         >
           Edit

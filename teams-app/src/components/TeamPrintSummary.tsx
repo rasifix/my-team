@@ -1,4 +1,5 @@
 import { getPlayerById } from '../services/playerService';
+import { getTrainerById } from '../services/trainerService';
 import { formatDate } from '../utils/dateFormatter';
 import type { Event, Team } from '../types';
 
@@ -48,6 +49,7 @@ export default function TeamPrintSummary({ event, teams, isOpen, onClose }: Team
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {teams.map((team) => {
               const selectedPlayers = team.selectedPlayers || [];
+              const trainer = team.trainerId ? getTrainerById(team.trainerId) : null;
               const playersData = selectedPlayers
                 .map(playerId => getPlayerById(playerId))
                 .filter(Boolean)
@@ -65,6 +67,9 @@ export default function TeamPrintSummary({ event, teams, isOpen, onClose }: Team
                     <h1 className="text-xl font-bold text-gray-900 mb-1">{team.name}</h1>
                     <div className="text-sm text-gray-600">
                       <p>📅 {formatDate(event.date)} 🕐 {event.startTime}</p>
+                      {trainer && (
+                        <p className="text-blue-600 font-medium">👨‍🏫 {trainer.firstName} {trainer.lastName}</p>
+                      )}
                     </div>
                   </div>
 
