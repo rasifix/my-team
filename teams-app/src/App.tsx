@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useEffect } from 'react';
 import Header from './components/Header';
 import HomePage from './pages/HomePage';
 import PlayersPage from './pages/PlayersPage';
@@ -11,15 +10,8 @@ import StatisticsPage from './pages/StatisticsPage';
 import PlayerStatisticsPage from './pages/PlayerStatisticsPage';
 import EventAttendancePage from './pages/EventAttendancePage';
 import ShirtSetsPage from './pages/ShirtSetsPage';
-import { migrateScoreToLevel, migrateMaxPlayersToEvent } from './utils/migrations';
 
 function App() {
-  useEffect(() => {
-    // Run migrations on app startup
-    migrateScoreToLevel();
-    migrateMaxPlayersToEvent();
-  }, []);
-
   return (
     <Router>
       <div className="min-h-screen bg-gray-50">
