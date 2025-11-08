@@ -32,7 +32,7 @@ function App() {
             <Route path="/trainers" element={<TrainersPage />} />
             <Route path="/events" element={<EventsPage />} />
             <Route path="/events/:id" element={<EventDetailPage />} />
-            <Route path="/shirt-sets" element={<ShirtSetsPage />} />
+            <Route path="/shirts" element={<ShirtSetsPage />} />
             <Route path="/statistics" element={<StatisticsPage />}>
               <Route path="player-statistics" element={<PlayerStatisticsPage />} />
               <Route path="event-attendance" element={<EventAttendancePage />} />

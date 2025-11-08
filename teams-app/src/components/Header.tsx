@@ -46,7 +46,7 @@ export default function Header() {
     { path: '/players', label: 'Players' },
     { path: '/trainers', label: 'Trainers' },
     { path: '/events', label: 'Events' },
-    { path: '/shirt-sets', label: 'Shirt Sets' },
+    { path: '/shirts', label: 'Shirts' },
     { path: '/statistics', label: 'Statistics' },
   ];
 
