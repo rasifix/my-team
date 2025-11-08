@@ -99,3 +99,25 @@ export async function removeShirtFromSet(shirtSetId: string, shirtId: string): P
     }
   });
 }
+
+// Helper function to update a shirt in a shirt set
+export async function updateShirt(shirtSetId: string, updatedShirt: Shirt): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const shirtSet = localStorage.getShirtSetById(shirtSetId);
+    if (!shirtSet) {
+      setTimeout(() => reject(new Error('Shirt set not found')), 0);
+      return;
+    }
+
+    const updatedShirts = shirtSet.shirts.map(shirt => 
+      shirt.id === updatedShirt.id ? updatedShirt : shirt
+    );
+    const success = localStorage.updateShirtSet(shirtSetId, { shirts: updatedShirts });
+    
+    if (success) {
+      setTimeout(() => resolve(), 0);
+    } else {
+      setTimeout(() => reject(new Error('Failed to update shirt')), 0);
+    }
+  });
+}

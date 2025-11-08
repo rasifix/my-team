@@ -19,7 +19,7 @@ export default function AddShirtSetModal({ onClose, onSubmit }: AddShirtSetModal
     createShirts: false,
     startNumber: 1,
     endNumber: 11,
-    size: 'M' as 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL',
+    size: 'M' as '128' | '140' | '152' | '164' | 'XS' | 'S' | 'M' | 'L' | 'XL',
     includeGoalkeeper: false,
     goalkeeperNumber: 1
   });
@@ -88,7 +88,7 @@ export default function AddShirtSetModal({ onClose, onSubmit }: AddShirtSetModal
         </ModalHeader>
 
         <ModalBody>
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div>
               <label htmlFor="sponsor" className="block text-sm font-medium text-gray-700 mb-1">
                 Sponsor Name *
@@ -128,14 +128,11 @@ export default function AddShirtSetModal({ onClose, onSubmit }: AddShirtSetModal
                   className="input-field flex-1"
                 />
               </div>
-              <p className="text-sm text-gray-500 mt-1">
-                Choose a color or enter a hex code
-              </p>
             </div>
 
             {/* Shirt creation options */}
-            <div className="border-t pt-4">
-              <div className="flex items-center mb-4">
+            <div className="border-t pt-3">
+              <div className="flex items-center mb-3">
                 <input
                   id="createShirts"
                   name="createShirts"
@@ -150,11 +147,11 @@ export default function AddShirtSetModal({ onClose, onSubmit }: AddShirtSetModal
               </div>
 
               {shirtOptions.createShirts && (
-                <div className="space-y-4 pl-6 border-l-2 border-gray-100">
-                  <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-3 pl-4 border-l-2 border-gray-100">
+                  <div className="grid grid-cols-3 gap-3">
                     <div>
-                      <label htmlFor="startNumber" className="block text-sm font-medium text-gray-700 mb-1">
-                        Start Number
+                      <label htmlFor="startNumber" className="block text-xs font-medium text-gray-700 mb-1">
+                        Start #
                       </label>
                       <input
                         id="startNumber"
@@ -164,12 +161,12 @@ export default function AddShirtSetModal({ onClose, onSubmit }: AddShirtSetModal
                         max="99"
                         value={shirtOptions.startNumber}
                         onChange={handleShirtOptionChange}
-                        className="input-field w-full"
+                        className="input-field w-full text-sm"
                       />
                     </div>
                     <div>
-                      <label htmlFor="endNumber" className="block text-sm font-medium text-gray-700 mb-1">
-                        End Number
+                      <label htmlFor="endNumber" className="block text-xs font-medium text-gray-700 mb-1">
+                        End #
                       </label>
                       <input
                         id="endNumber"
@@ -179,74 +176,74 @@ export default function AddShirtSetModal({ onClose, onSubmit }: AddShirtSetModal
                         max="99"
                         value={shirtOptions.endNumber}
                         onChange={handleShirtOptionChange}
-                        className="input-field w-full"
+                        className="input-field w-full text-sm"
                       />
                     </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="size" className="block text-sm font-medium text-gray-700 mb-1">
-                      Shirt Size
-                    </label>
-                    <select
-                      id="size"
-                      name="size"
-                      value={shirtOptions.size}
-                      onChange={handleShirtOptionChange}
-                      className="input-field w-full"
-                    >
-                      <option value="XS">XS</option>
-                      <option value="S">S</option>
-                      <option value="M">M</option>
-                      <option value="L">L</option>
-                      <option value="XL">XL</option>
-                      <option value="XXL">XXL</option>
-                    </select>
-                  </div>
-
-                  <div className="flex items-center">
-                    <input
-                      id="includeGoalkeeper"
-                      name="includeGoalkeeper"
-                      type="checkbox"
-                      checked={shirtOptions.includeGoalkeeper}
-                      onChange={handleShirtOptionChange}
-                      className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
-                    />
-                    <label htmlFor="includeGoalkeeper" className="ml-2 text-sm font-medium text-gray-700">
-                      Include goalkeeper shirt
-                    </label>
-                  </div>
-
-                  {shirtOptions.includeGoalkeeper && (
-                    <div className="pl-6">
-                      <label htmlFor="goalkeeperNumber" className="block text-sm font-medium text-gray-700 mb-1">
-                        Goalkeeper Number
+                    <div>
+                      <label htmlFor="size" className="block text-xs font-medium text-gray-700 mb-1">
+                        Size
                       </label>
-                      <input
-                        id="goalkeeperNumber"
-                        name="goalkeeperNumber"
-                        type="number"
-                        min="1"
-                        max="99"
-                        value={shirtOptions.goalkeeperNumber}
+                      <select
+                        id="size"
+                        name="size"
+                        value={shirtOptions.size}
                         onChange={handleShirtOptionChange}
-                        className="input-field w-20"
-                      />
+                        className="input-field w-full text-sm"
+                      >
+                        <option value="128">128</option>
+                        <option value="140">140</option>
+                        <option value="152">152</option>
+                        <option value="164">164</option>
+                        <option value="XS">XS</option>
+                        <option value="S">S</option>
+                        <option value="M">M</option>
+                        <option value="L">L</option>
+                        <option value="XL">XL</option>
+                      </select>
                     </div>
-                  )}
+                  </div>
 
-                  <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded">
-                    <strong>Preview:</strong> This will create {
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <input
+                        id="includeGoalkeeper"
+                        name="includeGoalkeeper"
+                        type="checkbox"
+                        checked={shirtOptions.includeGoalkeeper}
+                        onChange={handleShirtOptionChange}
+                        className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                      />
+                      <label htmlFor="includeGoalkeeper" className="ml-2 text-sm text-gray-700">
+                        Include GK
+                      </label>
+                    </div>
+                    
+                    {shirtOptions.includeGoalkeeper && (
+                      <div className="flex items-center gap-2">
+                        <label htmlFor="goalkeeperNumber" className="text-xs text-gray-700">
+                          GK #:
+                        </label>
+                        <input
+                          id="goalkeeperNumber"
+                          name="goalkeeperNumber"
+                          type="number"
+                          min="1"
+                          max="99"
+                          value={shirtOptions.goalkeeperNumber}
+                          onChange={handleShirtOptionChange}
+                          className="input-field w-16 text-sm"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded">
+                    Will create {
                       Math.max(0, shirtOptions.endNumber - shirtOptions.startNumber + 1 - 
                         (shirtOptions.includeGoalkeeper && 
                          shirtOptions.goalkeeperNumber >= shirtOptions.startNumber && 
                          shirtOptions.goalkeeperNumber <= shirtOptions.endNumber ? 1 : 0))
-                    } regular shirt{Math.max(0, shirtOptions.endNumber - shirtOptions.startNumber + 1 - 
-                        (shirtOptions.includeGoalkeeper && 
-                         shirtOptions.goalkeeperNumber >= shirtOptions.startNumber && 
-                         shirtOptions.goalkeeperNumber <= shirtOptions.endNumber ? 1 : 0)) !== 1 ? 's' : ''}
-                    {shirtOptions.includeGoalkeeper ? ` + 1 goalkeeper shirt` : ''} (size {shirtOptions.size})
+                    } regular{shirtOptions.includeGoalkeeper ? ' + 1 GK' : ''} shirt{(Math.max(0, shirtOptions.endNumber - shirtOptions.startNumber + 1) + (shirtOptions.includeGoalkeeper ? 1 : 0)) !== 1 ? 's' : ''} (size {shirtOptions.size})
                   </div>
                 </div>
               )}

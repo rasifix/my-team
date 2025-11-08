@@ -125,6 +125,28 @@ export function useShirtSets() {
     }
   };
 
+  // Update shirt in set
+  const updateShirt = async (shirtSetId: string, updatedShirt: Shirt): Promise<boolean> => {
+    try {
+      setError(null);
+      await shirtService.updateShirt(shirtSetId, updatedShirt);
+      setShirtSets(prev => 
+        prev.map(shirtSet => 
+          shirtSet.id === shirtSetId 
+            ? { ...shirtSet, shirts: shirtSet.shirts.map(shirt => 
+                shirt.id === updatedShirt.id ? updatedShirt : shirt
+              )}
+            : shirtSet
+        )
+      );
+      return true;
+    } catch (err) {
+      setError('Failed to update shirt');
+      console.error('Error updating shirt:', err);
+      return false;
+    }
+  };
+
   return {
     shirtSets,
     loading,
@@ -134,5 +156,6 @@ export function useShirtSets() {
     deleteShirtSet,
     addShirtToSet,
     removeShirtFromSet,
+    updateShirt,
   };
 }

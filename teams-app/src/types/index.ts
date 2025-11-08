@@ -47,7 +47,7 @@ export interface PlayerEventHistoryItem {
 export interface Shirt {
   id: string;
   number: number;
-  size: 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL';
+  size: '128' | '140' | '152' | '164' | 'XS' | 'S' | 'M' | 'L' | 'XL';
   isGoalkeeper: boolean;
 }
 
