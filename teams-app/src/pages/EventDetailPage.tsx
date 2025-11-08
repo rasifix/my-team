@@ -10,6 +10,7 @@ import EditTeamModal from '../components/EditTeamModal';
 import EditEventModal from '../components/EditEventModal';
 import ConfirmDialog from '../components/ConfirmDialog';
 import TeamCard from '../components/TeamCard';
+import TeamPrintSummary from '../components/TeamPrintSummary';
 import { autoSelectTeams } from '../utils/selectionAlgorithm';
 import { formatDate } from '../utils/dateFormatter';
 
@@ -23,6 +24,7 @@ export default function EventDetailPage() {
   const [isEditTeamModalOpen, setIsEditTeamModalOpen] = useState(false);
   const [isEditEventModalOpen, setIsEditEventModalOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [isPrintSummaryOpen, setIsPrintSummaryOpen] = useState(false);
   const [editingTeam, setEditingTeam] = useState<{ id: string; name: string; strength: number } | null>(null);
   const [dragOverTeamId, setDragOverTeamId] = useState<string | null>(null);
   const [dragOverPlayerId, setDragOverPlayerId] = useState<string | null>(null);
@@ -330,7 +332,7 @@ export default function EventDetailPage() {
           <div className="flex-1">
             <h1 className="page-title">{event.name}</h1>
             <p className="page-subtitle">
-              {formatDate(event.date)} 🕐 {event.startTime}
+              📅 {formatDate(event.date)} 🕐 {event.startTime}
             </p>
             <p className="mt-3 text-gray-600">
               Max players: {event.maxPlayersPerTeam}
@@ -358,12 +360,21 @@ export default function EventDetailPage() {
         <div className="card card-body">
           <div className="flex justify-between items-center mb-4">
             <h2 className="card-title">Teams</h2>
-            <button 
-              onClick={handleAddTeam}
-              className="btn-primary btn-sm"
-            >
-              Add Team
-            </button>
+            <div className="flex gap-2">
+              <button 
+                onClick={() => setIsPrintSummaryOpen(true)}
+                className="btn-secondary btn-sm"
+                disabled={event.teams.length === 0}
+              >
+                Print Teams
+              </button>
+              <button 
+                onClick={handleAddTeam}
+                className="btn-primary btn-sm"
+              >
+                Add Team
+              </button>
+            </div>
           </div>
           {event.teams.length === 0 ? (
             <div className="empty-state">
@@ -442,6 +453,13 @@ export default function EventDetailPage() {
         onConfirm={confirmDeleteEvent}
         onCancel={cancelDeleteEvent}
         confirmButtonColor="red"
+      />
+
+      <TeamPrintSummary
+        event={event}
+        teams={event.teams}
+        isOpen={isPrintSummaryOpen}
+        onClose={() => setIsPrintSummaryOpen(false)}
       />
     </div>
   );
