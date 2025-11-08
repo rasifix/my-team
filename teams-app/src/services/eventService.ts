@@ -23,8 +23,8 @@ export async function getEvents(): Promise<Event[]> {
 export async function addEvent(event: Event): Promise<Event> {
   return new Promise((resolve, reject) => {
     // Validate required fields
-    if (!event.name || !event.date || !event.startTime) {
-      setTimeout(() => reject(new Error('Event name, date, and start time are required')), 0);
+    if (!event.name || !event.date) {
+      setTimeout(() => reject(new Error('Event name and date are required')), 0);
       return;
     };
     

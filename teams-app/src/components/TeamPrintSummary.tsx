@@ -68,7 +68,7 @@ export default function TeamPrintSummary({ event, teams, isOpen, onClose }: Team
                     <h2 className="text-lg font-semibold text-gray-700 mb-1">{event.name}</h2>
                     <h1 className="text-xl font-bold text-gray-900 mb-1">{team.name}</h1>
                     <div className="text-sm text-gray-600">
-                      <p>📅 {formatDate(event.date)} 🕐 {event.startTime}</p>
+                      <p>📅 {formatDate(event.date)} 🕐 {team.startTime}</p>
                       {trainer && (
                         <p className="text-blue-600 font-medium">👨‍🏫 {trainer.firstName} {trainer.lastName}</p>
                       )}

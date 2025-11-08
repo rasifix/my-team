@@ -12,7 +12,7 @@ interface TeamCardProps {
   maxPlayersPerTeam: number;
   isDragOver: boolean;
   dragOverPlayerId: string | null;
-  onEditTeam: (teamId: string, currentName: string, currentStrength: number, currentTrainerId?: string) => void;
+  onEditTeam: (teamId: string, currentName: string, currentStrength: number, currentStartTime: string, currentTrainerId?: string) => void;
   onAssignShirts: (team: Team) => void;
   onRemovePlayer: (teamId: string, playerId: string) => void;
   onSwitchPlayers: (sourceTeamId: string, sourcePlayerId: string, targetTeamId: string, targetPlayerId: string) => void;
@@ -84,10 +84,10 @@ export default function TeamCard({
       <div className="flex justify-between items-start mb-2">
         <div>
           <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-            {team.name} <Strength level={team.strength || 2} />
+            {team.name} <Strength level={team.strength || 2} /> {selectedPlayers.length} / {maxPlayersPerTeam}
           </h3>
           <p className="text-sm text-gray-600">
-            Selected: {selectedPlayers.length}/{maxPlayersPerTeam}
+            🕐 {team.startTime}
           </p>
           {trainer && (
             <p className="text-sm text-blue-600">
@@ -102,7 +102,7 @@ export default function TeamCard({
         </div>
         <div className="flex gap-2">
           <button 
-            onClick={() => onEditTeam(team.id, team.name, team.strength || 2, team.trainerId)}
+            onClick={() => onEditTeam(team.id, team.name, team.strength || 2, team.startTime, team.trainerId)}
             className="text-blue-600 hover:text-blue-700 text-sm"
           >
             Edit

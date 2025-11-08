@@ -6,9 +6,10 @@ import { useTrainers } from '../hooks/useTrainers';
 interface EditTeamModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (name: string, strength: number, trainerId?: string) => void;
+  onSave: (name: string, strength: number, startTime: string, trainerId?: string) => void;
   currentName: string;
   currentStrength: number;
+  currentStartTime: string;
   currentTrainerId?: string;
 }
 
@@ -18,10 +19,12 @@ export default function EditTeamModal({
   onSave, 
   currentName,
   currentStrength,
+  currentStartTime,
   currentTrainerId,
 }: EditTeamModalProps) {
   const [teamName, setTeamName] = useState(currentName);
   const [strength, setStrength] = useState(currentStrength);
+  const [startTime, setStartTime] = useState(currentStartTime);
   const [trainerId, setTrainerId] = useState(currentTrainerId || '');
 
   const { trainers } = useTrainers();
@@ -29,13 +32,14 @@ export default function EditTeamModal({
   useEffect(() => {
     setTeamName(currentName);
     setStrength(currentStrength);
+    setStartTime(currentStartTime);
     setTrainerId(currentTrainerId || '');
-  }, [currentName, currentStrength, currentTrainerId, isOpen]);
+  }, [currentName, currentStrength, currentStartTime, currentTrainerId, isOpen]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (teamName.trim()) {
-      onSave(teamName.trim(), strength, trainerId || undefined);
+      onSave(teamName.trim(), strength, startTime, trainerId || undefined);
       onClose();
     }
   };
@@ -79,6 +83,20 @@ export default function EditTeamModal({
                 <option value={2}>2 - Medium 🔥🔥</option>
                 <option value={3}>3 - Lowest 🔥</option>
               </select>
+            </div>
+
+            <div>
+              <label htmlFor="startTime" className="form-label">
+                Start Time
+              </label>
+              <input
+                type="time"
+                id="startTime"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+                required
+                className="form-input"
+              />
             </div>
 
             <div>

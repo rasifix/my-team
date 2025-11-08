@@ -10,6 +10,7 @@ export interface Team {
   id: string;
   name: string;
   strength: number; // 1 (highest) to 3 (lowest), default 2
+  startTime: string; // HH:MM format - each team can have different start times
   selectedPlayers: string[]; // Player IDs assigned to this team
   trainerId?: string; // Trainer ID assigned to this team
   shirtSetId?: string; // Shirt set ID assigned to this team
@@ -26,7 +27,6 @@ export interface Event {
   id: string;
   name: string;
   date: string; // ISO date string
-  startTime: string; // HH:MM format
   maxPlayersPerTeam: number; // Max players applies to all teams in this event
   teams: Team[]; // Teams are contained within the event
   invitations: Invitation[];
@@ -41,7 +41,6 @@ export interface PlayerEventHistoryItem {
   eventId: string;
   eventName: string;
   eventDate: string; // ISO date string
-  eventStartTime: string; // HH:MM format
   invitationStatus: 'open' | 'accepted' | 'declined';
   isSelected: boolean;
   teamName?: string;

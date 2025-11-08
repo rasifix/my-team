@@ -32,7 +32,7 @@ export default function EventDetailPage() {
   const [isEditEventModalOpen, setIsEditEventModalOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [isPrintSummaryOpen, setIsPrintSummaryOpen] = useState(false);
-  const [editingTeam, setEditingTeam] = useState<{ id: string; name: string; strength: number; trainerId?: string } | null>(null);
+  const [editingTeam, setEditingTeam] = useState<{ id: string; name: string; strength: number; startTime: string; trainerId?: string } | null>(null);
   const [assigningShirtsTeam, setAssigningShirtsTeam] = useState<Team | null>(null);
   const [dragOverTeamId, setDragOverTeamId] = useState<string | null>(null);
   const [dragOverPlayerId, setDragOverPlayerId] = useState<string | null>(null);
@@ -51,6 +51,7 @@ export default function EventDetailPage() {
       id: crypto.randomUUID(),
       name: `Team ${event.teams.length + 1}`,
       strength: 2,
+      startTime: '10:00', // Default start time
       selectedPlayers: [],
     };
 
@@ -65,16 +66,16 @@ export default function EventDetailPage() {
     }
   };
 
-  const handleEditTeamName = (teamId: string, currentName: string, currentStrength: number, currentTrainerId?: string) => {
-    setEditingTeam({ id: teamId, name: currentName, strength: currentStrength, trainerId: currentTrainerId });
+  const handleEditTeamName = (teamId: string, currentName: string, currentStrength: number, currentStartTime: string, currentTrainerId?: string) => {
+    setEditingTeam({ id: teamId, name: currentName, strength: currentStrength, startTime: currentStartTime, trainerId: currentTrainerId });
     setIsEditTeamModalOpen(true);
   };
 
-  const handleSaveTeamName = async (newName: string, newStrength: number, newTrainerId?: string) => {
+  const handleSaveTeamName = async (newName: string, newStrength: number, newStartTime: string, newTrainerId?: string) => {
     if (!event || !id || !editingTeam) return;
 
     const updatedTeams = event.teams.map(team =>
-      team.id === editingTeam.id ? { ...team, name: newName, strength: newStrength, trainerId: newTrainerId } : team
+      team.id === editingTeam.id ? { ...team, name: newName, strength: newStrength, startTime: newStartTime, trainerId: newTrainerId } : team
     );
 
     const success = await updateEvent(id, { teams: updatedTeams });
@@ -118,7 +119,7 @@ export default function EventDetailPage() {
     setIsAssignShirtsModalOpen(false);
   };
 
-  const handleSaveEvent = async (data: { name: string; date: string; startTime: string; maxPlayersPerTeam: number }) => {
+  const handleSaveEvent = async (data: { name: string; date: string; maxPlayersPerTeam: number }) => {
     if (!event || !id) return;
 
     const success = await updateEvent(id, data);
@@ -368,7 +369,7 @@ export default function EventDetailPage() {
           <div className="flex-1">
             <h1 className="page-title">{event.name}</h1>
             <p className="page-subtitle">
-              📅 {formatDate(event.date)} 🕐 {event.startTime}
+              📅 {formatDate(event.date)}
             </p>
           </div>
           <div className="flex gap-3">
@@ -463,6 +464,7 @@ export default function EventDetailPage() {
         onSave={handleSaveTeamName}
         currentName={editingTeam?.name || ''}
         currentStrength={editingTeam?.strength || 2}
+        currentStartTime={editingTeam?.startTime || '10:00'}
         currentTrainerId={editingTeam?.trainerId}
       />
 
@@ -484,7 +486,6 @@ export default function EventDetailPage() {
         currentData={{
           name: event.name,
           date: event.date,
-          startTime: event.startTime,
           maxPlayersPerTeam: event.maxPlayersPerTeam,
         }}
         minMaxPlayers={Math.max(...event.teams.map(team => (team.selectedPlayers || []).length), 1)}

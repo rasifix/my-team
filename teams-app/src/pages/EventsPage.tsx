@@ -24,13 +24,13 @@ export default function EventsPage() {
       id: crypto.randomUUID(),
       name: `Team ${index + 1}`,
       strength: 2, // Default strength
+      startTime: eventData.startTime, // All teams get the same start time initially
       selectedPlayers: [], // Players will be assigned during selection
     }));
 
     const success = await addEvent({
       name: eventData.name,
       date: eventData.date,
-      startTime: eventData.startTime,
       maxPlayersPerTeam: eventData.maxPlayersPerTeam,
       teams,
       invitations: [],

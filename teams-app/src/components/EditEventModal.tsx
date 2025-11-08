@@ -5,11 +5,10 @@ import Button from './ui/Button';
 interface EditEventModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: { name: string; date: string; startTime: string; maxPlayersPerTeam: number }) => void;
+  onSave: (data: { name: string; date: string; maxPlayersPerTeam: number }) => void;
   currentData: {
     name: string;
     date: string;
-    startTime: string;
     maxPlayersPerTeam: number;
   };
   minMaxPlayers: number;
@@ -24,7 +23,6 @@ export default function EditEventModal({
 }: EditEventModalProps) {
   const [name, setName] = useState(currentData.name);
   const [date, setDate] = useState(currentData.date);
-  const [startTime, setStartTime] = useState(currentData.startTime);
   const [maxPlayersPerTeam, setMaxPlayersPerTeam] = useState(currentData.maxPlayersPerTeam);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,7 +30,6 @@ export default function EditEventModal({
     if (isOpen) {
       setName(currentData.name);
       setDate(currentData.date);
-      setStartTime(currentData.startTime);
       setMaxPlayersPerTeam(currentData.maxPlayersPerTeam);
       setError(null);
     }
@@ -52,11 +49,6 @@ export default function EditEventModal({
       return;
     }
 
-    if (!startTime) {
-      setError('Start time is required');
-      return;
-    }
-
     if (maxPlayersPerTeam < minMaxPlayers) {
       setError(`Max players cannot be less than ${minMaxPlayers} (current largest team size)`);
       return;
@@ -70,7 +62,6 @@ export default function EditEventModal({
     onSave({
       name: name.trim(),
       date,
-      startTime,
       maxPlayersPerTeam,
     });
     onClose();
@@ -110,20 +101,6 @@ export default function EditEventModal({
                 id="eventDate"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                required
-                className="form-input"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="eventStartTime" className="form-label">
-                Start Time
-              </label>
-              <input
-                type="time"
-                id="eventStartTime"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
                 required
                 className="form-input"
               />

@@ -56,7 +56,6 @@ export default function PlayerDetailPage() {
         eventId: event.id,
         eventName: event.name,
         eventDate: event.date,
-        eventStartTime: event.startTime,
         invitationStatus,
         isSelected,
         teamName: team?.name
@@ -181,7 +180,7 @@ export default function PlayerDetailPage() {
                     <div className="flex-1">
                       <h3 className="font-semibold text-gray-900">{event.name}</h3>
                       <p className="text-sm text-gray-600 mt-1">
-                        📅 {formatDate(event.date)} 🕐 {event.startTime}
+                        📅 {formatDate(event.date)}
                       </p>
                     </div>
                     <Button

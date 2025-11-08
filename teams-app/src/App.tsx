@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { migrateStartTimeToTeam } from './utils/migrations';
 import Header from './components/Header';
 import HomePage from './pages/HomePage';
 import PlayersPage from './pages/PlayersPage';
@@ -12,6 +14,11 @@ import EventAttendancePage from './pages/EventAttendancePage';
 import ShirtSetsPage from './pages/ShirtSetsPage';
 
 function App() {
+  // Run data migrations on app startup
+  useEffect(() => {
+    migrateStartTimeToTeam();
+  }, []);
+
   return (
     <Router>
       <div className="min-h-screen bg-gray-50">

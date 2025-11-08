@@ -33,7 +33,7 @@ export default function PlayerEventHistory({
                     <div className="flex-1">
                       <h3 className="font-semibold text-gray-900">{item.eventName}</h3>
                       <p className="text-sm text-gray-600 mt-1">
-                        📅 {formatDate(item.eventDate)} 🕐 {item.eventStartTime}
+                        📅 {formatDate(item.eventDate)}
                       </p>
                     </div>
                     <div className="flex flex-col items-end gap-2">
