@@ -36,6 +36,12 @@ export default function TeamCard({
 }: TeamCardProps) {
   const selectedPlayers = team.selectedPlayers || [];
   const hasCapacity = selectedPlayers.length < maxPlayersPerTeam;
+  
+  // Calculate sum of player levels
+  const totalLevels = selectedPlayers.reduce((sum, playerId) => {
+    const player = getPlayerById(playerId);
+    return sum + (player?.level || 0);
+  }, 0);
   const trainer = team.trainerId ? getTrainerById(team.trainerId) : null;
   const shirtSet = team.shirtSetId ? getShirtSetById(team.shirtSetId) : null;
 
@@ -84,7 +90,7 @@ export default function TeamCard({
       <div className="flex justify-between items-start mb-2">
         <div>
           <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-            {team.name} <Strength level={team.strength || 2} /> {selectedPlayers.length} / {maxPlayersPerTeam}
+            {team.name} <Strength level={team.strength || 2} /> 
           </h3>
           <p className="text-sm text-gray-600">
             🕐 {team.startTime}
@@ -117,7 +123,7 @@ export default function TeamCard({
       </div>
       {selectedPlayers.length > 0 && (
         <div className="mt-3 pt-3 border-t border-gray-100">
-          <h4 className="text-xs font-medium text-gray-500 mb-2">Players:</h4>
+          <h4 className="text-xs font-medium text-gray-500 mb-2">Players {selectedPlayers.length} / {maxPlayersPerTeam} <span className='text-yellow-500'>★</span> {totalLevels}</h4>
           <div className="space-y-1">
             {selectedPlayers
               .map(playerId => ({ playerId, player: getPlayerById(playerId) }))
