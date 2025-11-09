@@ -1,9 +1,13 @@
+import { useState } from 'react';
 import { getPlayerById } from '../services/playerService';
-import type { Invitation } from '../types';
+import { getPlayerStats } from '../utils/playerStats';
+import { useEvents } from '../hooks/useEvents';
+import type { Invitation, Event } from '../types';
 import Level from './Level';
 
 interface PlayerInvitationsCardProps {
   invitations: Invitation[];
+  currentEvent: Event;
   onInviteClick: () => void;
   onStatusChange: (invitationId: string, newStatus: 'open' | 'accepted' | 'declined') => void;
   onRemoveInvitation: (invitationId: string) => void;
@@ -13,37 +17,80 @@ interface PlayerInvitationsCardProps {
 
 export default function PlayerInvitationsCard({
   invitations,
+  currentEvent,
   onInviteClick,
   onStatusChange,
   onRemoveInvitation,
   onAutoSelect,
   assignedPlayerIds = [],
 }: PlayerInvitationsCardProps) {
+  const [showOnlyAvailable, setShowOnlyAvailable] = useState(false);
+  const { events } = useEvents();
+
+  // Function to calculate real-time statistics including current event state
+  const getPlayerStatsWithCurrent = (playerId: string) => {
+    // Get historical stats from all events except current one
+    const historicalEvents = events.filter(e => e.id !== currentEvent.id);
+    const historicalStats = getPlayerStats(playerId, historicalEvents);
+    
+    // Check current event status
+    const currentInvitation = currentEvent.invitations.find(inv => inv.playerId === playerId);
+    const isCurrentlySelected = currentEvent.teams.some(team => 
+      (team.selectedPlayers || []).includes(playerId)
+    );
+    
+    // Add current event to stats
+    const acceptedCount = historicalStats.acceptedCount + 
+      (currentInvitation?.status === 'accepted' ? 1 : 0);
+    const selectedCount = historicalStats.selectedCount + 
+      (isCurrentlySelected ? 1 : 0);
+      
+    return { acceptedCount, selectedCount };
+  };
+
   const acceptedCount = invitations.filter(inv => inv.status === 'accepted').length;
   const openCount = invitations.filter(inv => inv.status === 'open').length;
   const declinedCount = invitations.filter(inv => inv.status === 'declined').length;
   const hasAnySelections = assignedPlayerIds.length > 0;
 
+  // Filter invitations based on toggle state
+  const filteredInvitations = showOnlyAvailable 
+    ? invitations.filter(inv => 
+        inv.status === 'accepted' && !assignedPlayerIds.includes(inv.playerId)
+      )
+    : invitations;
+
   return (
     <div className="bg-white shadow rounded-lg p-6">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold text-gray-900">Player Invitations</h2>
-        <div className="flex gap-2">
-          <button 
-            onClick={onInviteClick}
-            className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm"
-          >
-            Invite Players
-          </button>
-          {onAutoSelect && (
+        <div className="flex items-center gap-3">
+          <label className="flex items-center gap-2 text-sm text-gray-600">
+            <input
+              type="checkbox"
+              checked={showOnlyAvailable}
+              onChange={(e) => setShowOnlyAvailable(e.target.checked)}
+              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            Available only
+          </label>
+          <div className="flex gap-2">
             <button 
-              onClick={onAutoSelect}
-              disabled={acceptedCount === 0}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-sm disabled:bg-gray-300 disabled:cursor-not-allowed"
+              onClick={onInviteClick}
+              className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm"
             >
-              Auto Select
+              Invite Players
             </button>
-          )}
+            {onAutoSelect && (
+              <button 
+                onClick={onAutoSelect}
+                disabled={acceptedCount === 0}
+                className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-sm disabled:bg-gray-300 disabled:cursor-not-allowed"
+              >
+                Auto Select
+              </button>
+            )}
+          </div>
         </div>
       </div>
       {invitations.length > 0 && (
@@ -54,15 +101,26 @@ export default function PlayerInvitationsCard({
           {' / '}
           <span className="text-red-600 font-medium">{declinedCount}</span>
           <span className="ml-2 text-gray-500">(accepted / open / declined)</span>
+          {showOnlyAvailable && (
+            <span className="ml-2 text-blue-600">
+              • Showing {filteredInvitations.length} available
+            </span>
+          )}
         </div>
       )}
-      {invitations.length === 0 ? (
+      {filteredInvitations.length === 0 ? (
         <div className="text-gray-500 text-center py-4">
-          <p>No invitations sent yet.</p>
+          {invitations.length === 0 ? (
+            <p>No invitations sent yet.</p>
+          ) : showOnlyAvailable ? (
+            <p>No available players. All accepted players are already assigned to teams.</p>
+          ) : (
+            <p>No invitations match current filter.</p>
+          )}
         </div>
       ) : (
         <div className="space-y-2">
-          {[...invitations]
+          {[...filteredInvitations]
             .sort((a, b) => {
               const playerA = getPlayerById(a.playerId);
               const playerB = getPlayerById(b.playerId);
@@ -81,6 +139,9 @@ export default function PlayerInvitationsCard({
             const isDraggable = isAccepted && !isAssigned;
             const shouldDim = hasAnySelections && (invitation.status === 'declined' || invitation.status === 'open' || isAssigned);
             
+            // Calculate player statistics including current event real-time state
+            const stats = getPlayerStatsWithCurrent(invitation.playerId);
+            
             return (
               <div 
                 key={invitation.id} 
@@ -95,10 +156,17 @@ export default function PlayerInvitationsCard({
               >
                 <div className="flex justify-between items-center gap-3">
                   <div className="flex items-center gap-2 flex-1">
-                    <span className="text-sm text-gray-900">
-                      {player ? `${player.firstName} ${player.lastName}` : `Player ID: ${invitation.playerId}`}
-                    </span>
-                    {player && <Level level={player.level} className="text-sm" />}
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-900">
+                          {player ? `${player.firstName} ${player.lastName}` : `Player ID: ${invitation.playerId}`}
+                        </span>
+                        {player && <Level level={player.level} className="text-sm" />}
+                        <span className="text-xs text-gray-500 font-mono" title={`Accepted invitations: ${stats.acceptedCount}, Selected for teams: ${stats.selectedCount}`}>
+                          {stats.acceptedCount}/{stats.selectedCount}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <select

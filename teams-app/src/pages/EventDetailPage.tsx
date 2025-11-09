@@ -487,6 +487,7 @@ export default function EventDetailPage() {
         {/* Invitations Section */}
         <PlayerInvitationsCard
           invitations={event.invitations}
+          currentEvent={event}
           onInviteClick={() => setIsInviteModalOpen(true)}
           onStatusChange={handleInvitationStatusChange}
           onRemoveInvitation={handleRemoveInvitation}
