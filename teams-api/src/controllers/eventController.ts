@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { dataStore } from '../data/store';
 import { Event, Invitation } from '../types';
-import { randomUUID } from 'crypto';
+import { getNextSequence } from '../utils/sequence';
 
 export const getAllEvents = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -43,7 +43,7 @@ export const createEvent = async (req: Request, res: Response): Promise<void> =>
     }
     
     const newEvent: Event = {
-      id: randomUUID(),
+      id: await getNextSequence('events'),
       groupId,
       name,
       date,
@@ -128,7 +128,7 @@ export const upsertInvitations = async (req: Request, res: Response): Promise<vo
     for (const playerId of playerIds) {
       if (!existingPlayerIds.has(playerId)) {
         newInvitations.push({
-          id: randomUUID(),
+          id: await getNextSequence('invitations'),
           playerId,
           status: 'open'
         });

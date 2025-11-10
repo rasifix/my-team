@@ -6,6 +6,7 @@ import {
   updateGroup,
   deleteGroup
 } from '../controllers/groupController';
+import { importLocalStorageData } from '../controllers/importController';
 
 // Import nested route handlers
 import membersRoutes from './membersRoutes';
@@ -20,6 +21,9 @@ router.get('/:id', getGroupById);
 router.post('/', createGroup);
 router.put('/:id', updateGroup);
 router.delete('/:id', deleteGroup);
+
+// Import data from localStorage format
+router.post('/:groupId/import', importLocalStorageData);
 
 // Nested routes under groups
 // All nested routes will have groupId available in req.params

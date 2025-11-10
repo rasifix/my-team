@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { dataStore } from '../data/store';
 import { Group } from '../types';
-import { randomUUID } from 'crypto';
+import { getNextSequence } from '../utils/sequence';
 
 // GET /api/groups
 export const getAllGroups = async (_req: Request, res: Response): Promise<void> => {
@@ -43,7 +43,7 @@ export const createGroup = async (req: Request, res: Response): Promise<void> =>
     }
     
     const newGroup: Group = {
-      id: randomUUID(),
+      id: await getNextSequence('groups'),
       name
     };
     

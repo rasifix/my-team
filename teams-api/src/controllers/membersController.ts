@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { dataStore } from '../data/store';
 import { Player, Trainer } from '../types';
-import { randomUUID } from 'crypto';
+import { getNextSequence } from '../utils/sequence';
 
 // GET /api/groups/:groupId/members?role=player|trainer or GET /api/groups/:groupId/members (returns all)
 export const getAllMembers = async (req: Request, res: Response): Promise<void> => {
@@ -87,7 +87,7 @@ export const createMember = async (req: Request, res: Response): Promise<void> =
       }
       
       const newPlayer: Player = {
-        id: randomUUID(),
+        id: await getNextSequence('members'),
         groupId,
         firstName,
         lastName,
@@ -99,7 +99,7 @@ export const createMember = async (req: Request, res: Response): Promise<void> =
       res.status(201).json({ ...createdPlayer, role: 'player' });
     } else {
       const newTrainer: Trainer = {
-        id: randomUUID(),
+        id: await getNextSequence('members'),
         groupId,
         firstName,
         lastName

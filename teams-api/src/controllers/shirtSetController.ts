@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { dataStore } from '../data/store';
 import type { ShirtSet } from '../types';
+import { getNextSequence } from '../utils/sequence';
 
 // GET /api/groups/:groupId/shirtsets
 export const getShirtSets = async (req: Request, res: Response): Promise<void> => {
@@ -44,7 +45,7 @@ export const createShirtSet = async (req: Request, res: Response): Promise<void>
     }
     
     const newShirtSet: ShirtSet = {
-      id: crypto.randomUUID(),
+      id: await getNextSequence('shirtsets'),
       groupId,
       sponsor,
       color,

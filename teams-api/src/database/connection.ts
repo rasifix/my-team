@@ -6,6 +6,7 @@ import {
   ShirtSetDocument,
   COLLECTIONS 
 } from '../types/mongodb';
+import { initializeSequences } from '../utils/sequence';
 
 // MongoDB connection configuration from environment variables
 interface MongoConfig {
@@ -145,6 +146,9 @@ class DatabaseConnection {
 
       // Create indexes for optimal query performance
       await this.createIndexes();
+      
+      // Initialize sequence counters
+      await initializeSequences();
       
       console.log('✅ Database initialization completed');
       
