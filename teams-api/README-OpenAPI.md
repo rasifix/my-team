@@ -9,19 +9,19 @@ This directory contains the OpenAPI 3.0.3 specification for the Teams API.
 ## Overview
 
 The Teams API provides endpoints for managing:
-- **People** (Players and Trainers) - Unified endpoint for managing both players and trainers
+- **Members** (Players and Trainers) - Unified endpoint for managing both players and trainers
 - **Events** - Soccer events with team management and player invitations
 - **Shirt Sets** - Equipment management for team jerseys
 
 ## Key Features
 
-### Unified People Endpoint
-Instead of separate `/players` and `/trainers` endpoints, the API uses a single `/people` endpoint with role-based filtering:
+### Unified Members Endpoint
+Instead of separate `/players` and `/trainers` endpoints, the API uses a single `/members` endpoint with role-based filtering:
 
 ```
-GET /api/people?role=player    # Get all players
-GET /api/people?role=trainer   # Get all trainers
-GET /api/people                # Get both players and trainers
+GET /api/members?role=player    # Get all players
+GET /api/members?role=trainer   # Get all trainers
+GET /api/members                # Get both players and trainers
 ```
 
 ### Event Management
@@ -61,7 +61,7 @@ Import the specification into:
 
 ### Create a Player
 ```json
-POST /api/people
+POST /api/Members
 {
   "role": "player",
   "firstName": "John",
@@ -73,7 +73,7 @@ POST /api/people
 
 ### Create a Trainer
 ```json
-POST /api/people
+POST /api/Members
 {
   "role": "trainer",
   "firstName": "Jane",

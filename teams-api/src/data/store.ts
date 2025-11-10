@@ -1,11 +1,14 @@
 import { mongoConnection } from '../database/connection';
-import { Player, Event, Trainer, ShirtSet } from '../types';
+import { Player, Event, Trainer, ShirtSet, Group } from '../types';
 import { 
+  GroupDocument,
   PersonDocument, 
   EventDocument, 
   ShirtSetDocument
 } from '../types/mongodb';
 import {
+  groupDocumentToGroup,
+  groupToGroupDocument,
   personDocumentToPlayer,
   personDocumentToTrainer,
   playerToPersonDocument,
@@ -18,10 +21,65 @@ import {
 
 // MongoDB-based data store
 class DataStore {
-  // Player operations
-  async getAllPlayers(): Promise<Player[]> {
+  // Group operations
+  async getAllGroups(): Promise<Group[]> {
+    const groupsCollection = mongoConnection.getGroupsCollection();
+    const groupDocs = await groupsCollection.find({}).sort({ createdAt: -1 }).toArray();
+    return groupDocs.map(groupDocumentToGroup);
+  }
+
+  async getGroupById(id: string): Promise<Group | undefined> {
+    const groupsCollection = mongoConnection.getGroupsCollection();
+    const groupDoc = await groupsCollection.findOne({ _id: id });
+    return groupDoc ? groupDocumentToGroup(groupDoc) : undefined;
+  }
+
+  async createGroup(group: Group): Promise<Group> {
+    const groupsCollection = mongoConnection.getGroupsCollection();
+    const groupDoc = groupToGroupDocument(group);
+    const now = new Date();
+
+    const newDoc: GroupDocument = {
+      _id: group.id,
+      ...groupDoc,
+      createdAt: now,
+      updatedAt: now
+    };
+
+    await groupsCollection.insertOne(newDoc);
+    return group;
+  }
+
+  async updateGroup(id: string, updates: Partial<Pick<Group, 'name'>>): Promise<Group | null> {
+    const groupsCollection = mongoConnection.getGroupsCollection();
+    const updateDoc = {
+      ...updates,
+      updatedAt: new Date()
+    };
+
+    const result = await groupsCollection.findOneAndUpdate(
+      { _id: id },
+      { $set: updateDoc },
+      { returnDocument: 'after' }
+    );
+
+    return result ? groupDocumentToGroup(result) : null;
+  }
+
+  async deleteGroup(id: string): Promise<boolean> {
+    const groupsCollection = mongoConnection.getGroupsCollection();
+    const result = await groupsCollection.deleteOne({ _id: id });
+    return result.deletedCount > 0;
+  }
+
+  // Player operations (now scoped to groups)
+  async getAllPlayers(groupId?: string): Promise<Player[]> {
     const membersCollection = mongoConnection.getMembersCollection();
-    const playerDocs = await membersCollection.find({ role: 'player' }).toArray();
+    const filter: any = { role: 'player' as const };
+    if (groupId) {
+      filter.groupId = groupId;
+    }
+    const playerDocs = await membersCollection.find(filter).toArray();
     return playerDocs
       .map(personDocumentToPlayer)
       .filter((player): player is Player => player !== null);
@@ -80,9 +138,10 @@ class DataStore {
   }
 
   // Event operations
-  async getAllEvents(): Promise<Event[]> {
+  async getAllEvents(groupId?: string): Promise<Event[]> {
     const eventsCollection = mongoConnection.getEventsCollection();
-    const eventDocs = await eventsCollection.find({}).sort({ eventDate: -1 }).toArray();
+    const filter = groupId ? { groupId } : {};
+    const eventDocs = await eventsCollection.find(filter).sort({ eventDate: -1 }).toArray();
     return eventDocs.map(eventDocumentToEvent);
   }
 
@@ -143,9 +202,13 @@ class DataStore {
   }
 
   // Trainer operations
-  async getAllTrainers(): Promise<Trainer[]> {
+  async getAllTrainers(groupId?: string): Promise<Trainer[]> {
     const membersCollection = mongoConnection.getMembersCollection();
-    const trainerDocs = await membersCollection.find({ role: 'trainer' }).toArray();
+    const filter: any = { role: 'trainer' as const };
+    if (groupId) {
+      filter.groupId = groupId;
+    }
+    const trainerDocs = await membersCollection.find(filter).toArray();
     return trainerDocs
       .map(personDocumentToTrainer)
       .filter((trainer): trainer is Trainer => trainer !== null);
@@ -204,9 +267,13 @@ class DataStore {
   }
 
   // Shirt Set operations
-  async getAllShirtSets(): Promise<ShirtSet[]> {
+  async getAllShirtSets(groupId?: string): Promise<ShirtSet[]> {
     const shirtSetsCollection = mongoConnection.getShirtSetsCollection();
-    const shirtSetDocs = await shirtSetsCollection.find({ active: { $ne: false } }).toArray();
+    const filter: any = { active: { $ne: false } };
+    if (groupId) {
+      filter.groupId = groupId;
+    }
+    const shirtSetDocs = await shirtSetsCollection.find(filter).toArray();
     return shirtSetDocs.map(shirtSetDocumentToShirtSet);
   }
 

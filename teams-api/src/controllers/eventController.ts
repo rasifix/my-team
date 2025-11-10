@@ -3,9 +3,10 @@ import { dataStore } from '../data/store';
 import { Event, Invitation } from '../types';
 import { randomUUID } from 'crypto';
 
-export const getAllEvents = async (_req: Request, res: Response): Promise<void> => {
+export const getAllEvents = async (req: Request, res: Response): Promise<void> => {
   try {
-    const events = await dataStore.getAllEvents();
+    const { groupId } = req.params;
+    const events = await dataStore.getAllEvents(groupId);
     res.json(events);
   } catch (error) {
     console.error('Error fetching events:', error);
@@ -32,6 +33,7 @@ export const getEventById = async (req: Request, res: Response): Promise<void> =
 
 export const createEvent = async (req: Request, res: Response): Promise<void> => {
   try {
+    const { groupId } = req.params;
     const { name, date, maxPlayersPerTeam, teams, invitations } = req.body;
     
     // Validation
@@ -42,6 +44,7 @@ export const createEvent = async (req: Request, res: Response): Promise<void> =>
     
     const newEvent: Event = {
       id: randomUUID(),
+      groupId,
       name,
       date,
       maxPlayersPerTeam: Number(maxPlayersPerTeam),

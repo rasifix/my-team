@@ -1,9 +1,24 @@
 export interface Player {
   id: string;
+  groupId: string;
   firstName: string;
   lastName: string;
   birthYear: number;
   level: number; // 1-5
+}
+
+export interface Trainer {
+  id: string;
+  groupId: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface Group {
+  id: string;
+  name: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Invitation {
@@ -25,6 +40,7 @@ export interface Team {
 
 export interface Event {
   id: string;
+  groupId: string;
   name: string;
   date: string; // ISO date string
   maxPlayersPerTeam: number; // Max players applies to all teams in this event
@@ -40,6 +56,7 @@ export interface Shirt {
 
 export interface ShirtSet {
   id: string;
+  groupId: string;
   sponsor: string;
   color: string;
   shirts: Shirt[];

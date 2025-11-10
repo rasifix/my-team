@@ -3,22 +3,23 @@ import { dataStore } from '../data/store';
 import { Player, Trainer } from '../types';
 import { randomUUID } from 'crypto';
 
-// GET /api/members?role=player|trainer or GET /api/members (returns all)
+// GET /api/groups/:groupId/members?role=player|trainer or GET /api/groups/:groupId/members (returns all)
 export const getAllMembers = async (req: Request, res: Response): Promise<void> => {
   try {
+    const { groupId } = req.params;
     const { role } = req.query;
     
     if (role === 'player') {
-      const players = await dataStore.getAllPlayers();
+      const players = await dataStore.getAllPlayers(groupId);
       res.json(players);
     } else if (role === 'trainer') {
-      const trainers = await dataStore.getAllTrainers();
+      const trainers = await dataStore.getAllTrainers(groupId);
       res.json(trainers);
     } else if (!role) {
       // Return both players and trainers
       const [players, trainers] = await Promise.all([
-        dataStore.getAllPlayers(),
-        dataStore.getAllTrainers()
+        dataStore.getAllPlayers(groupId),
+        dataStore.getAllTrainers(groupId)
       ]);
       res.json({
         players,
@@ -58,9 +59,10 @@ export const getMemberById = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// POST /api/members
+// POST /api/groups/:groupId/members
 export const createMember = async (req: Request, res: Response): Promise<void> => {
   try {
+    const { groupId } = req.params;
     const { role, firstName, lastName, birthYear, level } = req.body;
     
     if (!role || !firstName || !lastName) {
@@ -86,6 +88,7 @@ export const createMember = async (req: Request, res: Response): Promise<void> =
       
       const newPlayer: Player = {
         id: randomUUID(),
+        groupId,
         firstName,
         lastName,
         birthYear,
@@ -97,6 +100,7 @@ export const createMember = async (req: Request, res: Response): Promise<void> =
     } else {
       const newTrainer: Trainer = {
         id: randomUUID(),
+        groupId,
         firstName,
         lastName
       };

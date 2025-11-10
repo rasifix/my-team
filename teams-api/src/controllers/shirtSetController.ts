@@ -2,10 +2,11 @@ import { Request, Response } from 'express';
 import { dataStore } from '../data/store';
 import type { ShirtSet } from '../types';
 
-// GET /api/shirt-sets
-export const getShirtSets = async (_req: Request, res: Response): Promise<void> => {
+// GET /api/groups/:groupId/shirtsets
+export const getShirtSets = async (req: Request, res: Response): Promise<void> => {
   try {
-    const shirtSets = await dataStore.getAllShirtSets();
+    const { groupId } = req.params;
+    const shirtSets = await dataStore.getAllShirtSets(groupId);
     res.json(shirtSets);
   } catch (error) {
     console.error('Error fetching shirt sets:', error);
@@ -34,6 +35,7 @@ export const getShirtSetById = async (req: Request, res: Response): Promise<void
 // POST /api/shirt-sets
 export const createShirtSet = async (req: Request, res: Response): Promise<void> => {
   try {
+    const { groupId } = req.params;
     const { sponsor, color, shirts } = req.body;
     
     if (!sponsor || !color || !Array.isArray(shirts)) {
@@ -43,6 +45,7 @@ export const createShirtSet = async (req: Request, res: Response): Promise<void>
     
     const newShirtSet: ShirtSet = {
       id: crypto.randomUUID(),
+      groupId,
       sponsor,
       color,
       shirts,

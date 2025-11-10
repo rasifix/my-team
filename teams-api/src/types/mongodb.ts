@@ -5,11 +5,17 @@ export interface BaseDocument {
   updatedAt: Date;
 }
 
+// Groups Collection
+export interface GroupDocument extends BaseDocument {
+  name: string;
+}
+
 // Members Collection - Unified collection for players and trainers
 export interface PersonDocument extends BaseDocument {
   firstName: string;
   lastName: string;
   role: 'player' | 'trainer';
+  groupId: string; // Reference to GroupDocument
   // Player-specific properties (only present when role === 'player')
   birthYear?: number;
   level?: number; // 1-5
@@ -47,6 +53,7 @@ export interface EventDocument extends BaseDocument {
   name: string;
   eventDate: Date; // Using Date instead of string for better MongoDB operations
   maxPlayersPerTeam: number;
+  groupId: string; // Reference to GroupDocument
   teams: TeamEmbedded[];
   invitations: InvitationEmbedded[];
 }
@@ -62,6 +69,7 @@ export interface ShirtEmbedded {
 export interface ShirtSetDocument extends BaseDocument {
   sponsor: string;
   color: string;
+  groupId: string; // Reference to GroupDocument
   shirts: ShirtEmbedded[];
   active: boolean; // For soft deletion
 }
@@ -90,6 +98,7 @@ export function isTrainerDocument(person: PersonDocument): person is TrainerDocu
 
 // Collection names constants
 export const COLLECTIONS = {
+  GROUPS: 'groups',
   MEMBERS: 'members',
   EVENTS: 'events',
   SHIRT_SETS: 'shirt-sets'

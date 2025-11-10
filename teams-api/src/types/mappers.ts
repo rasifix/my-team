@@ -1,4 +1,5 @@
 import type { 
+  GroupDocument,
   PersonDocument, 
   EventDocument, 
   ShirtSetDocument,
@@ -6,6 +7,7 @@ import type {
   InvitationEmbedded
 } from './mongodb';
 import type { 
+  Group,
   Player, 
   Trainer, 
   Event, 
@@ -13,6 +15,23 @@ import type {
   Team, 
   Invitation 
 } from './index';
+
+// Convert MongoDB GroupDocument to API Group
+export function groupDocumentToGroup(doc: GroupDocument): Group {
+  return {
+    id: doc._id,
+    name: doc.name,
+    createdAt: doc.createdAt.toISOString(),
+    updatedAt: doc.updatedAt.toISOString()
+  };
+}
+
+// Convert API Group to MongoDB GroupDocument (for create operations)
+export function groupToGroupDocument(group: Group): Omit<GroupDocument, '_id' | 'createdAt' | 'updatedAt'> {
+  return {
+    name: group.name
+  };
+}
 
 // Convert MongoDB PersonDocument to API Player
 export function personDocumentToPlayer(doc: PersonDocument): Player | null {
@@ -22,6 +41,7 @@ export function personDocumentToPlayer(doc: PersonDocument): Player | null {
   
   return {
     id: doc._id,
+    groupId: doc.groupId,
     firstName: doc.firstName,
     lastName: doc.lastName,
     birthYear: doc.birthYear,
@@ -37,28 +57,31 @@ export function personDocumentToTrainer(doc: PersonDocument): Trainer | null {
   
   return {
     id: doc._id,
+    groupId: doc.groupId,
     firstName: doc.firstName,
     lastName: doc.lastName
   };
 }
 
-// Convert API Player to MongoDB PersonDocument (for creation)
-export function playerToPersonDocument(player: Omit<Player, 'id'>): Omit<PersonDocument, '_id' | 'createdAt' | 'updatedAt'> {
+// Convert API Player to MongoDB PersonDocument (for create operations)
+export function playerToPersonDocument(player: Player): Omit<PersonDocument, '_id' | 'createdAt' | 'updatedAt'> {
   return {
     firstName: player.firstName,
     lastName: player.lastName,
     role: 'player',
+    groupId: player.groupId,
     birthYear: player.birthYear,
     level: player.level
   };
 }
 
-// Convert API Trainer to MongoDB PersonDocument (for creation)
-export function trainerToPersonDocument(trainer: Omit<Trainer, 'id'>): Omit<PersonDocument, '_id' | 'createdAt' | 'updatedAt'> {
+// Convert API Trainer to MongoDB PersonDocument (for create operations)
+export function trainerToPersonDocument(trainer: Trainer): Omit<PersonDocument, '_id' | 'createdAt' | 'updatedAt'> {
   return {
     firstName: trainer.firstName,
     lastName: trainer.lastName,
-    role: 'trainer'
+    role: 'trainer',
+    groupId: trainer.groupId
   };
 }
 
@@ -120,6 +143,7 @@ export function teamToEmbedded(team: Team): TeamEmbedded {
 export function eventDocumentToEvent(doc: EventDocument): Event {
   return {
     id: doc._id,
+    groupId: doc.groupId,
     name: doc.name,
     date: doc.eventDate.toISOString().split('T')[0], // Convert Date to ISO string
     maxPlayersPerTeam: doc.maxPlayersPerTeam,
@@ -134,6 +158,7 @@ export function eventToEventDocument(event: Omit<Event, 'id'>): Omit<EventDocume
     name: event.name,
     eventDate: new Date(event.date),
     maxPlayersPerTeam: event.maxPlayersPerTeam,
+    groupId: event.groupId,
     teams: event.teams.map(teamToEmbedded),
     invitations: event.invitations.map(invitationToEmbedded)
   };
@@ -143,6 +168,7 @@ export function eventToEventDocument(event: Omit<Event, 'id'>): Omit<EventDocume
 export function shirtSetDocumentToShirtSet(doc: ShirtSetDocument): ShirtSet {
   return {
     id: doc._id,
+    groupId: doc.groupId,
     sponsor: doc.sponsor,
     color: doc.color,
     shirts: doc.shirts // Shirts are embedded and have the same structure
@@ -154,6 +180,7 @@ export function shirtSetToShirtSetDocument(shirtSet: Omit<ShirtSet, 'id'>): Omit
   return {
     sponsor: shirtSet.sponsor,
     color: shirtSet.color,
+    groupId: shirtSet.groupId,
     shirts: shirtSet.shirts, // Shirts have the same structure
     active: true
   };

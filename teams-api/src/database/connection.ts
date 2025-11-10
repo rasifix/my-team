@@ -1,5 +1,6 @@
 import { MongoClient, Db, Collection } from 'mongodb';
 import { 
+  GroupDocument,
   PersonDocument, 
   EventDocument, 
   ShirtSetDocument,
@@ -109,6 +110,10 @@ class DatabaseConnection {
   }
 
   // Get typed collections
+  getGroupsCollection(): Collection<GroupDocument> {
+    return this.getDb().collection<GroupDocument>(COLLECTIONS.GROUPS);
+  }
+
   getMembersCollection(): Collection<PersonDocument> {
     return this.getDb().collection<PersonDocument>(COLLECTIONS.MEMBERS);
   }
@@ -152,8 +157,14 @@ class DatabaseConnection {
   private async createIndexes(): Promise<void> {
     console.log('🔍 Creating database indexes...');
     
+    // Groups collection indexes
+    const groupsCollection = this.getGroupsCollection();
+    await groupsCollection.createIndex({ name: 1 }); // Group name lookup
+    await groupsCollection.createIndex({ createdAt: -1 }); // Recent groups first
+    
     // Members collection indexes
     const membersCollection = this.getMembersCollection();
+    await membersCollection.createIndex({ groupId: 1 }); // Group membership lookup
     await membersCollection.createIndex({ role: 1 });
     await membersCollection.createIndex({ firstName: 1, lastName: 1 });
     await membersCollection.createIndex({ role: 1, birthYear: 1 }); // For player queries
@@ -162,6 +173,7 @@ class DatabaseConnection {
 
     // Events collection indexes
     const eventsCollection = this.getEventsCollection();
+    await eventsCollection.createIndex({ groupId: 1 }); // Group events lookup
     await eventsCollection.createIndex({ eventDate: -1 }); // Recent events first
     await eventsCollection.createIndex({ 'teams.selectedPlayers': 1 }); // Player participation
     await eventsCollection.createIndex({ 'invitations.playerId': 1 }); // Invitation lookups
@@ -171,6 +183,7 @@ class DatabaseConnection {
 
     // Shirt Sets collection indexes
     const shirtSetsCollection = this.getShirtSetsCollection();
+    await shirtSetsCollection.createIndex({ groupId: 1 }); // Group shirt sets lookup
     await shirtSetsCollection.createIndex({ sponsor: 1, color: 1 });
     await shirtSetsCollection.createIndex({ active: 1 });
     await shirtSetsCollection.createIndex({ createdAt: -1 });
