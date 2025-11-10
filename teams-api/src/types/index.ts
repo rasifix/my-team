@@ -27,9 +27,23 @@ export interface Event {
   id: string;
   name: string;
   date: string; // ISO date string
-  maxPlayersPerTeam: number;
-  teams: Team[];
+  maxPlayersPerTeam: number; // Max players applies to all teams in this event
+  teams: Team[]; // Teams are contained within the event
   invitations: Invitation[];
+}
+
+export interface PlayerSelection {
+  playerId: string;
+  teamId: string;
+}
+
+export interface PlayerEventHistoryItem {
+  eventId: string;
+  eventName: string;
+  eventDate: string; // ISO date string
+  invitationStatus: 'open' | 'accepted' | 'declined';
+  isSelected: boolean;
+  teamName?: string;
 }
 
 export interface Shirt {

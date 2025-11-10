@@ -3,12 +3,12 @@ import { dataStore } from '../data/store';
 import { Event, Invitation } from '../types';
 import { randomUUID } from 'crypto';
 
-export const getAllEvents = (req: Request, res: Response) => {
+export const getAllEvents = (_req: Request, res: Response): void => {
   const events = dataStore.getAllEvents();
   res.json(events);
 };
 
-export const getEventById = (req: Request, res: Response) => {
+export const getEventById = (req: Request, res: Response): void => {
   const { id } = req.params;
   const event = dataStore.getEventById(id);
   

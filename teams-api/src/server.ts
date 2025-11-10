@@ -19,12 +19,12 @@ app.use('/api/trainers', trainerRoutes);
 app.use('/api/shirt-sets', shirtSetRoutes);
 
 // Health check
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({ status: 'ok', message: 'Teams API is running' });
 });
 
 // 404 handler
-app.use((req, res) => {
+app.use((_req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
