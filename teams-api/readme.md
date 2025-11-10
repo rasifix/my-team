@@ -4,10 +4,37 @@ Express.js + TypeScript backend for the My Teams application.
 
 ## Getting Started
 
+### Prerequisites
+- Node.js 18+ 
+- MongoDB 4.4+ (local installation or cloud instance)
+
 ### Installation
 ```bash
 npm install
 ```
+
+### Environment Configuration
+1. Copy `.env.example` to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Configure your MongoDB connection in `.env`:
+   ```bash
+   # For local development
+   MONGODB_HOST=localhost
+   MONGODB_PORT=27017
+   MONGODB_DATABASE=teams-dev
+   
+   # For production or cloud MongoDB
+   MONGODB_URL=mongodb+srv://username:password@cluster.mongodb.net/teams
+   ```
+
+### Database Setup
+The API will automatically:
+- Connect to MongoDB on startup
+- Create required collections (`people`, `events`, `shirt-sets`)
+- Create optimized indexes for performance
 
 ### Development
 ```bash
@@ -45,7 +72,27 @@ npm start
 * `PUT /api/events/:id/selection` - Update player selection for teams
 
 ### Health Check
-* `GET /health` - Check if the API is running
+* `GET /health` - Check if the API and database are running
+
+## Database Schema
+
+The API uses MongoDB with three collections:
+
+### Collections
+- `people` - Unified collection for players and trainers
+- `events` - Events with embedded teams and invitations  
+- `shirt-sets` - Shirt sets with embedded shirts
+
+### Environment Variables
+| Variable | Description | Default | Example |
+|----------|-------------|---------|---------|
+| `MONGODB_URL` | Full MongoDB connection string | - | `mongodb+srv://user:pass@cluster.net/db` |
+| `MONGODB_HOST` | MongoDB host | `localhost` | `localhost` |
+| `MONGODB_PORT` | MongoDB port | `27017` | `27017` |
+| `MONGODB_DATABASE` | Database name | `teams` | `teams-dev` |
+| `MONGODB_USERNAME` | Username for authentication | - | `teams-user` |
+| `MONGODB_PASSWORD` | Password for authentication | - | `secure-password` |
+| `PORT` | API server port | `3000` | `8080` |
 
 ## Data Models
 
@@ -95,5 +142,6 @@ npm start
 ## Technology Stack
 - Express.js - Web framework
 - TypeScript - Type safety
+- MongoDB - Document database
 - tsx - TypeScript execution and hot reload
-- In-memory data store (can be replaced with a database)
+- dotenv - Environment variable management

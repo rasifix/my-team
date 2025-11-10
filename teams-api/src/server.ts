@@ -1,5 +1,7 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import { mongoConnection } from './database/connection';
 import playerRoutes from './routes/playerRoutes';
 import eventRoutes from './routes/eventRoutes';
 import trainerRoutes from './routes/trainerRoutes';
@@ -19,8 +21,21 @@ app.use('/api/trainers', trainerRoutes);
 app.use('/api/shirt-sets', shirtSetRoutes);
 
 // Health check
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', message: 'Teams API is running' });
+app.get('/health', async (_req, res) => {
+  try {
+    const dbHealth = await mongoConnection.healthCheck();
+    res.json({ 
+      status: 'ok', 
+      message: 'Teams API is running',
+      database: dbHealth
+    });
+  } catch (error) {
+    res.status(503).json({ 
+      status: 'error', 
+      message: 'Teams API is running but database is unhealthy',
+      error: error instanceof Error ? error.message : 'Unknown database error'
+    });
+  }
 });
 
 // 404 handler
@@ -28,8 +43,34 @@ app.use((_req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-  console.log(`API endpoints available at http://localhost:${PORT}/api`);
-});
+// Start server with database initialization
+async function startServer() {
+  try {
+    // Connect to MongoDB first
+    await mongoConnection.connect();
+    
+    // Start the Express server
+    app.listen(PORT, () => {
+      console.log(`🚀 Server is running on http://localhost:${PORT}`);
+      console.log(`📡 API endpoints available at http://localhost:${PORT}/api`);
+      console.log(`🩺 Health check: http://localhost:${PORT}/health`);
+      console.log('');
+      console.log('Available endpoints:');
+      console.log('  GET    /api/players');
+      console.log('  POST   /api/players');
+      console.log('  GET    /api/events');
+      console.log('  POST   /api/events');
+      console.log('  GET    /api/trainers');
+      console.log('  POST   /api/trainers');
+      console.log('  GET    /api/shirt-sets');
+      console.log('  POST   /api/shirt-sets');
+    });
+    
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+// Start the server
+startServer();

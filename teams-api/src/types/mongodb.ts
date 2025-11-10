@@ -1,0 +1,100 @@
+import { ObjectId } from 'mongodb';
+
+// Base MongoDB document interface
+export interface BaseDocument {
+  _id: ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// People Collection - Unified collection for players and trainers
+export interface PersonDocument extends BaseDocument {
+  firstName: string;
+  lastName: string;
+  role: 'player' | 'trainer';
+  // Player-specific properties (only present when role === 'player')
+  birthYear?: number;
+  level?: number; // 1-5
+}
+
+// Embedded invitation document (within events)
+export interface InvitationEmbedded {
+  id: string;
+  playerId: ObjectId; // Reference to PersonDocument with role 'player'
+  status: 'open' | 'accepted' | 'declined';
+  sentAt?: Date;
+  respondedAt?: Date;
+}
+
+// Embedded shirt assignment (within teams)
+export interface ShirtAssignmentEmbedded {
+  playerId: ObjectId; // Reference to PersonDocument with role 'player'
+  shirtNumber: number;
+}
+
+// Embedded team document (within events)
+export interface TeamEmbedded {
+  id: string;
+  name: string;
+  strength: number; // 1 (highest) to 3 (lowest), default 2
+  startTime: string; // HH:MM format
+  selectedPlayers: ObjectId[]; // References to PersonDocument with role 'player'
+  trainerId?: ObjectId; // Reference to PersonDocument with role 'trainer'
+  shirtSetId?: ObjectId; // Reference to ShirtSetDocument
+  shirtAssignments?: ShirtAssignmentEmbedded[];
+}
+
+// Events Collection
+export interface EventDocument extends BaseDocument {
+  name: string;
+  eventDate: Date; // Using Date instead of string for better MongoDB operations
+  maxPlayersPerTeam: number;
+  teams: TeamEmbedded[];
+  invitations: InvitationEmbedded[];
+}
+
+// Embedded shirt document (within shirt sets)
+export interface ShirtEmbedded {
+  number: number;
+  size: '128' | '140' | '152' | '164' | 'XS' | 'S' | 'M' | 'L' | 'XL';
+  isGoalkeeper: boolean;
+}
+
+// Shirt Sets Collection
+export interface ShirtSetDocument extends BaseDocument {
+  sponsor: string;
+  color: string;
+  shirts: ShirtEmbedded[];
+  active: boolean; // For soft deletion
+}
+
+// Helper types for queries and operations
+export type PlayerDocument = PersonDocument & {
+  role: 'player';
+  birthYear: number;
+  level: number;
+};
+
+export type TrainerDocument = PersonDocument & {
+  role: 'trainer';
+};
+
+// Type guards for runtime type checking
+export function isPlayerDocument(person: PersonDocument): person is PlayerDocument {
+  return person.role === 'player' && 
+         typeof person.birthYear === 'number' && 
+         typeof person.level === 'number';
+}
+
+export function isTrainerDocument(person: PersonDocument): person is TrainerDocument {
+  return person.role === 'trainer';
+}
+
+// Collection names constants
+export const COLLECTIONS = {
+  PEOPLE: 'people',
+  EVENTS: 'events',
+  SHIRT_SETS: 'shirt-sets'
+} as const;
+
+export type CollectionName = typeof COLLECTIONS[keyof typeof COLLECTIONS];
