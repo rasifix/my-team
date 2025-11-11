@@ -5,7 +5,6 @@ import type { Trainer } from '../types';
 import { Card, CardBody, CardTitle } from '../components/ui';
 import AddTrainerModal from '../components/AddTrainerModal';
 import ConfirmDialog from '../components/ConfirmDialog';
-import { Button } from '../components/ui';
 import { formatDate } from '../utils/dateFormatter';
 
 interface TrainerEventHistoryItem {
@@ -83,19 +82,6 @@ export default function TrainerDetailPage() {
         teamStrength: team?.strength || 2
       };
     });
-
-  // Filter future events where trainer could be assigned
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const futureEventsWithoutTrainer = events
-    .filter(event => {
-      const eventDate = new Date(event.date);
-      eventDate.setHours(0, 0, 0, 0);
-      const isFuture = eventDate >= today;
-      const hasUnassignedTeams = event.teams.some(team => !team.trainerId);
-      return isFuture && hasUnassignedTeams;
-    })
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()); // Soonest first
 
   const handleEditTrainer = () => {
     setIsEditModalOpen(true);
@@ -239,47 +225,6 @@ export default function TrainerDetailPage() {
               <p className="text-gray-500 text-center py-8">
                 {trainer.firstName} hasn't been assigned to any teams yet.
               </p>
-            </CardBody>
-          </Card>
-        </div>
-      )}
-
-      {/* Available Future Events Section */}
-      {futureEventsWithoutTrainer.length > 0 && (
-        <div className="mt-6">
-          <Card>
-            <CardBody>
-              <CardTitle>Available Future Events</CardTitle>
-              <p className="text-sm text-gray-600 mt-1 mb-4">
-                Events with teams that need a trainer assignment
-              </p>
-              <div className="space-y-3">
-                {futureEventsWithoutTrainer.map((event) => {
-                  const unassignedTeams = event.teams.filter(team => !team.trainerId);
-                  return (
-                    <div 
-                      key={event.id}
-                      className="border border-gray-200 rounded-lg p-4 flex justify-between items-center hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900">{event.name}</h3>
-                        <p className="text-sm text-gray-600 mt-1">
-                          📅 {formatDate(event.date)}
-                        </p>
-                        <p className="text-sm text-gray-500 mt-1">
-                          {unassignedTeams.length} team{unassignedTeams.length !== 1 ? 's' : ''} need{unassignedTeams.length === 1 ? 's' : ''} a trainer
-                        </p>
-                      </div>
-                      <Button
-                        onClick={() => navigate(`/events/${event.id}`)}
-                        variant="primary"
-                      >
-                        Assign
-                      </Button>
-                    </div>
-                  );
-                })}
-              </div>
             </CardBody>
           </Card>
         </div>
