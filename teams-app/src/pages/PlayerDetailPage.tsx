@@ -1,8 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { useEvents } from '../hooks/useEvents';
-import { usePlayers } from '../hooks/usePlayers';
-import { getPlayerById } from '../services/playerService';
+import { useState } from 'react';
+import { useEvents, usePlayers, useAppLoading, useAppHasErrors, useAppErrors } from '../store';
 import type { Player, Invitation, PlayerEventHistoryItem } from '../types';
 import Level from '../components/Level';
 import { Card, CardBody, CardTitle } from '../components/ui';
@@ -15,36 +13,25 @@ import { formatDate } from '../utils/dateFormatter';
 export default function PlayerDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  
+  // Use store hooks
   const { events, updateEvent } = useEvents();
-  const { updatePlayer, deletePlayer } = usePlayers();
-  const [player, setPlayer] = useState<Player | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { updatePlayer, deletePlayer, getPlayerById } = usePlayers();
+  const isLoading = useAppLoading();
+  const hasErrors = useAppHasErrors();
+  const errors = useAppErrors();
+  
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
-  useEffect(() => {
-    const loadPlayer = async () => {
-      if (!id) {
-        setError('No player ID provided');
-        setLoading(false);
-        return;
-      }
-
-      try {
-        setLoading(true);
-        setError(null);
-        const loadedPlayer = await getPlayerById(id);
-        setPlayer(loadedPlayer);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load player');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadPlayer();
-  }, [id]);
+  // Get player from store
+  const player = id ? getPlayerById(id) : null;
+  
+  // Determine loading and error states
+  const loading = isLoading;
+  const error = !id ? 'No player ID provided' : 
+               (!player && !loading) ? 'Player not found' :
+               errors.players || (hasErrors ? 'Failed to load data' : null);
 
   if (loading) {
     return (
@@ -120,8 +107,8 @@ export default function PlayerDetailPage() {
   const handleUpdatePlayer = async (playerId: string, playerData: Omit<Player, 'id'>) => {
     const success = await updatePlayer(playerId, playerData);
     if (success) {
-      setPlayer({ ...playerData, id: playerId });
       setIsEditModalOpen(false);
+      // Player data will be automatically updated in the store
     }
   };
 

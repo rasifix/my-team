@@ -8,45 +8,85 @@ This is a React + Vite + TypeScript application for managing fair soccer team se
 - before launching the dev server, check whether it is already running
 
 ## Domain Model
-- **Players**: name (first + last), birth year, skill score (1-5)
-- **Events**: name, date, start time, teams, invited players, selection results
-- **Teams**: belong to events, have max player capacity
-- **Invitations**: link players to events with status (sent/accepted/declined)
+- **Players**: firstName, lastName, birth year, level (1-5)
+- **Events**: name, date, maxPlayersPerTeam, teams array, invitations array
+- **Teams**: belong to events, have selectedPlayers, trainerId, shirtSetId, strength (1-3), startTime
+- **Invitations**: link players to events with status (open/accepted/declined)
+- **Trainers**: firstName, lastName for team management
+- **ShirtSets**: sponsor, color, shirts array with numbers, sizes, goalkeeper flag
+- **Shirts**: number, size (128-164, XS-XL), isGoalkeeper boolean
 
 ## Architecture Decisions
-- **Frontend-only**: Uses localStorage for persistence (no backend initially)
+- **Full-stack**: React frontend with Node.js/Express backend API
+- **State Management**: Centralized Zustand store with automatic data synchronization
+- **Data Persistence**: MongoDB database with RESTful API endpoints
 - **Mobile-first**: Minimum screen size iPhone SE (375px width)
 - **Styling**: Tailwind CSS for utility-first responsive design
-- **Fair selection**: Algorithm must consider previous event participation
+- **Fair selection**: Algorithm considers previous event participation history
 
 ## Key Pages & Features
-- **Players Page**: CRUD operations, score editing
-- **Events Page**: Event listing and management
-- **Event Detail**: Team management, player invitations, selection process
-- **Statistics**: Attendance tracking and fairness metrics
+- **HomePage**: Navigation hub and application overview
+- **PlayersPage**: Player CRUD operations, level editing, automatic alphabetical sorting
+- **PlayersDetailPage**: Individual player statistics and event history
+- **EventsPage**: Event listing, management, automatic chronological sorting
+- **EventDetailPage**: Complex team management, player invitations, selection process
+- **TrainersPage**: Trainer management with alphabetical sorting
+- **ShirtSetsPage**: Shirt set management sorted by sponsor and color
+- **StatisticsPage**: Attendance tracking and fairness metrics
+- **PlayerStatisticsPage**: Individual player performance analytics
+- **EventAttendancePage**: Event attendance matrix and analysis
 
 ## Development Patterns
 When implementing:
-1. Create TypeScript interfaces for domain models first
-2. Implement localStorage utilities with proper error handling
-3. Use React hooks for state management (consider useReducer for complex state)
-4. Build responsive components with Tailwind CSS utility classes (mobile-first)
-5. Include fairness algorithms that track player participation history
+1. Use Zustand store for ALL data access - never call services directly from components
+2. Create TypeScript interfaces in `/types/index.ts` for domain models
+3. Implement API services in `/services/` with proper error handling
+4. Use store selectors and mutations for state management
+5. Build responsive components with Tailwind CSS utility classes (mobile-first)
+6. Include fairness algorithms that track player participation history
+7. Ensure automatic data sorting at store level (players by name, events by date)
+
+## State Management Architecture
+- **Zustand Store**: Central `useStore.ts` with devtools middleware
+- **Data Loading**: Upfront loading via `AppInitializer` component
+- **Selectors**: Individual hooks (`usePlayers`, `useEvents`, etc.) for clean component integration
+- **Mutations**: Store handles all CRUD operations with automatic API synchronization
+- **Error Handling**: Centralized loading/error states via store selectors
 
 ## Critical Features
-- Selection algorithm should display each player's previous event count
-- Invitation status tracking throughout the workflow
-- Statistics page showing attendance vs. selection ratios
+- Selection algorithm displays each player's previous event participation count
+- Invitation status tracking throughout the entire workflow
+- Statistics pages showing attendance vs. selection ratios and fairness metrics
 - Mobile-optimized UI for touch interactions
+- Team management with trainer assignments and shirt distributions
+- Player replacement and switching between teams
+- Event attendance matrix visualization
+- Individual player performance tracking
 
-## File Structure (to implement)
+## File Structure (current implementation)
 ```
 src/
-├── components/     # Reusable UI components
-├── pages/         # Page components
-├── types/         # TypeScript interfaces
-├── utils/         # localStorage, selection algorithms
-└── hooks/         # Custom React hooks
+├── components/         # Reusable UI components and modals
+├── pages/             # Main page components using store hooks
+├── types/             # TypeScript interfaces for all domain models
+├── services/          # API service layers for backend communication
+├── store/             # Zustand store implementation and selectors
+├── hooks/             # Store-connected hooks for component integration
+├── utils/             # Player statistics, date formatting utilities
+└── config/            # API configuration and environment settings
 ```
 
-Start with domain types and localStorage utilities before building UI components.
+## Backend API Structure
+```
+teams-api/
+├── src/
+│   ├── controllers/   # Request handlers for each entity
+│   ├── routes/        # Express route definitions
+│   ├── database/      # MongoDB connection and configuration
+│   ├── types/         # TypeScript interfaces and MongoDB schemas
+│   └── utils/         # Helper utilities and migrations
+├── mongo-init/        # Database initialization scripts
+└── docs/              # API documentation and import guides
+```
+
+Start with store selectors and API services before building UI components. Always use the Zustand store for state management - never call services directly from components.

@@ -1,10 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { useEvents } from '../hooks/useEvents';
-import { usePlayers } from '../hooks/usePlayers';
-import { useTrainers } from '../hooks/useTrainers';
-import { useShirtSets } from '../hooks/useShirtSets';
-import { getEventById } from '../services/eventService';
+import { useState } from 'react';
+import { useEvents, usePlayers, useTrainers, useShirtSets, useAppLoading, useAppHasErrors, useAppErrors } from '../store';
 import type { Event, Team, Invitation } from '../types';
 import InvitePlayersModal from '../components/InvitePlayersModal';
 import PlayerInvitationsCard from '../components/PlayerInvitationsCard';
@@ -20,14 +16,25 @@ import { formatDate } from '../utils/dateFormatter';
 export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { updateEvent, deleteEvent, events } = useEvents();
+  
+  // Use store hooks
+  const { events, updateEvent, deleteEvent, getEventById } = useEvents();
   const { players } = usePlayers();
-  // Initialize hooks for child components
   const { trainers } = useTrainers();
   const { shirtSets } = useShirtSets();
-  const [event, setEvent] = useState<Event | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const isLoading = useAppLoading();
+  const hasErrors = useAppHasErrors();
+  const errors = useAppErrors();
+  
+  // Get event from store
+  const event = id ? getEventById(id) : null;
+  
+  // Determine loading and error states
+  const loading = isLoading;
+  const error = !id ? 'No event ID provided' : 
+               (!event && !loading) ? 'Event not found' :
+               errors.events || (hasErrors ? 'Failed to load data' : null);
+  
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isEditTeamModalOpen, setIsEditTeamModalOpen] = useState(false);
   const [isAssignShirtsModalOpen, setIsAssignShirtsModalOpen] = useState(false);
@@ -38,25 +45,6 @@ export default function EventDetailPage() {
   const [assigningShirtsTeam, setAssigningShirtsTeam] = useState<Team | null>(null);
   const [dragOverTeamId, setDragOverTeamId] = useState<string | null>(null);
   const [dragOverPlayerId, setDragOverPlayerId] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (id) {
-      const loadEvent = async () => {
-        try {
-          setLoading(true);
-          setError(null);
-          const loadedEvent = await getEventById(id);
-          setEvent(loadedEvent);
-        } catch (err) {
-          setError('Failed to load event from server');
-          console.error('Error loading event:', err);
-        } finally {
-          setLoading(false);
-        }
-      };
-      loadEvent();
-    }
-  }, [id]);
 
   const handleAddTeam = async () => {
     if (!event || !id) return;
@@ -70,14 +58,8 @@ export default function EventDetailPage() {
     };
 
     const updatedTeams = [...event.teams, newTeam];
-    const success = await updateEvent(id, { teams: updatedTeams });
-
-    if (success) {
-      setEvent({
-        ...event,
-        teams: updatedTeams,
-      });
-    }
+    await updateEvent(id, { teams: updatedTeams });
+    // Store will automatically update the event data
   };
 
   const handleEditTeamName = (teamId: string, currentName: string, currentStrength: number, currentStartTime: string, currentTrainerId?: string) => {
@@ -92,14 +74,8 @@ export default function EventDetailPage() {
       team.id === editingTeam.id ? { ...team, name: newName, strength: newStrength, startTime: newStartTime, trainerId: newTrainerId } : team
     );
 
-    const success = await updateEvent(id, { teams: updatedTeams });
-
-    if (success) {
-      setEvent({
-        ...event,
-        teams: updatedTeams,
-      });
-    }
+    await updateEvent(id, { teams: updatedTeams });
+    // Store will automatically update the event data
 
     setEditingTeam(null);
     setIsEditTeamModalOpen(false);
@@ -120,14 +96,8 @@ export default function EventDetailPage() {
         : team
     );
 
-    const success = await updateEvent(id, { teams: updatedTeams });
-
-    if (success) {
-      setEvent({
-        ...event,
-        teams: updatedTeams,
-      });
-    }
+    await updateEvent(id, { teams: updatedTeams });
+    // Store will automatically update the event data
 
     setAssigningShirtsTeam(null);
     setIsAssignShirtsModalOpen(false);
@@ -136,14 +106,8 @@ export default function EventDetailPage() {
   const handleSaveEvent = async (data: { name: string; date: string; maxPlayersPerTeam: number }) => {
     if (!event || !id) return;
 
-    const success = await updateEvent(id, data);
-
-    if (success) {
-      setEvent({
-        ...event,
-        ...data,
-      });
-    }
+    await updateEvent(id, data);
+    // Store will automatically update the event data
 
     setIsEditEventModalOpen(false);
   };
@@ -176,14 +140,8 @@ export default function EventDetailPage() {
 
     const updatedInvitations = [...event.invitations, ...newInvitations];
     
-    const success = await updateEvent(id, { invitations: updatedInvitations });
-    
-    if (success) {
-      setEvent({
-        ...event,
-        invitations: updatedInvitations,
-      });
-    }
+    await updateEvent(id, { invitations: updatedInvitations });
+    // Store will automatically update the event data
   };
 
   const handleInvitationStatusChange = async (invitationId: string, newStatus: 'open' | 'accepted' | 'declined') => {
@@ -193,14 +151,8 @@ export default function EventDetailPage() {
       inv.id === invitationId ? { ...inv, status: newStatus } : inv
     );
 
-    const success = await updateEvent(id, { invitations: updatedInvitations });
-
-    if (success) {
-      setEvent({
-        ...event,
-        invitations: updatedInvitations,
-      });
-    }
+    await updateEvent(id, { invitations: updatedInvitations });
+    // Store will automatically update the event data
   };
 
   const handleRemoveInvitation = async (invitationId: string) => {
@@ -208,14 +160,8 @@ export default function EventDetailPage() {
 
     const updatedInvitations = event.invitations.filter(inv => inv.id !== invitationId);
 
-    const success = await updateEvent(id, { invitations: updatedInvitations });
-
-    if (success) {
-      setEvent({
-        ...event,
-        invitations: updatedInvitations,
-      });
-    }
+    await updateEvent(id, { invitations: updatedInvitations });
+    // Store will automatically update the event data
   };
 
   const handleAutoSelect = async () => {
@@ -236,14 +182,8 @@ export default function EventDetailPage() {
     // Run auto-selection algorithm
     const updatedTeams = autoSelectTeams(event);
     
-    const success = await updateEvent(id, { teams: updatedTeams });
-
-    if (success) {
-      setEvent({
-        ...event,
-        teams: updatedTeams,
-      });
-    }
+    await updateEvent(id, { teams: updatedTeams });
+    // Store will automatically update the event data
   };
 
   const handleRemovePlayerFromTeam = async (teamId: string, playerId: string) => {
@@ -259,14 +199,8 @@ export default function EventDetailPage() {
       return team;
     });
 
-    const success = await updateEvent(id, { teams: updatedTeams });
-
-    if (success) {
-      setEvent({
-        ...event,
-        teams: updatedTeams,
-      });
-    }
+    await updateEvent(id, { teams: updatedTeams });
+    // Store will automatically update the event data
   };
 
   // Validate and clean up teams to ensure no player is in multiple teams
@@ -333,14 +267,8 @@ export default function EventDetailPage() {
     // Validate to ensure no duplicates across teams
     const validatedTeams = validateAndCleanTeams(updatedTeams);
 
-    const success = await updateEvent(id, { teams: validatedTeams });
-
-    if (success) {
-      setEvent({
-        ...event,
-        teams: validatedTeams,
-      });
-    }
+    await updateEvent(id, { teams: validatedTeams });
+    // Store will automatically update the event data
   };
 
   const handleReplacePlayer = async (teamId: string, oldPlayerId: string, newPlayerId: string) => {
@@ -361,14 +289,8 @@ export default function EventDetailPage() {
       return team;
     });
 
-    const success = await updateEvent(id, { teams: updatedTeams });
-
-    if (success) {
-      setEvent({
-        ...event,
-        teams: updatedTeams,
-      });
-    }
+    await updateEvent(id, { teams: updatedTeams });
+    // Store will automatically update the event data
   };
 
   const handleSwitchPlayers = async (sourceTeamId: string, sourcePlayerId: string, targetTeamId: string, targetPlayerId: string) => {
@@ -399,14 +321,8 @@ export default function EventDetailPage() {
     // Validate to ensure no duplicates across teams
     const validatedTeams = validateAndCleanTeams(updatedTeams);
 
-    const success = await updateEvent(id, { teams: validatedTeams });
-
-    if (success) {
-      setEvent({
-        ...event,
-        teams: validatedTeams,
-      });
-    }
+    await updateEvent(id, { teams: validatedTeams });
+    // Store will automatically update the event data
   };
 
   if (loading) {

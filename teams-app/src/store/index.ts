@@ -34,10 +34,16 @@ export const usePlayers = () => {
 export const useEvents = () => {
   const events = useStore((state) => state.events);
   const getEventById = useStore((state) => state.getEventById);
+  const addEvent = useStore((state) => state.addEvent);
+  const updateEvent = useStore((state) => state.updateEvent);
+  const deleteEvent = useStore((state) => state.deleteEvent);
   
   return {
     events,
     getEventById,
+    addEvent,
+    updateEvent,
+    deleteEvent,
   };
 };
 
@@ -62,9 +68,21 @@ export const useTrainers = () => {
 export const useShirtSets = () => {
   const shirtSets = useStore((state) => state.shirtSets);
   const getShirtSetById = useStore((state) => state.getShirtSetById);
+  const addShirtSet = useStore((state) => state.addShirtSet);
+  const updateShirtSet = useStore((state) => state.updateShirtSet);
+  const deleteShirtSet = useStore((state) => state.deleteShirtSet);
+  const addShirtToSet = useStore((state) => state.addShirtToSet);
+  const removeShirtFromSet = useStore((state) => state.removeShirtFromSet);
+  const updateShirt = useStore((state) => state.updateShirt);
   
   return {
     shirtSets,
     getShirtSetById,
+    addShirtSet,
+    updateShirtSet,
+    deleteShirtSet,
+    addShirtToSet,
+    removeShirtFromSet,
+    updateShirt,
   };
 };
