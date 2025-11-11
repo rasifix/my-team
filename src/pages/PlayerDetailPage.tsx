@@ -169,13 +169,13 @@ export default function PlayerDetailPage() {
               onClick={handleEditPlayer}
               className="text-blue-600 hover:text-blue-700 text-sm font-medium"
             >
-              Edit Player
+              Edit
             </button>
             <button 
               onClick={handleDeletePlayer}
               className="text-red-600 hover:text-red-700 text-sm font-medium"
             >
-              Delete Player
+              Delete
             </button>
           </div>
         </div>

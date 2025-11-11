@@ -15,7 +15,7 @@ export default function MembersPage() {
   
   // Store hooks
   const { players, addPlayer: addPlayerToStore, deletePlayer } = usePlayers();
-  const { trainers, addTrainer, updateTrainer, deleteTrainer } = useTrainers();
+  const { trainers, addTrainer, deleteTrainer } = useTrainers();
   
   // Use individual selectors for loading/error states
   const isLoading = useAppLoading();
@@ -26,8 +26,7 @@ export default function MembersPage() {
   const [isPlayerModalOpen, setIsPlayerModalOpen] = useState(false);
   const [isTrainerModalOpen, setIsTrainerModalOpen] = useState(false);
   
-  // Edit states
-  const [editingTrainer, setEditingTrainer] = useState<Trainer | null>(null);
+  // Edit states - removed editingTrainer since we navigate to detail page
   
   // Delete confirmation states
   const [deletingPlayer, setDeletingPlayer] = useState<Player | null>(null);
@@ -51,9 +50,15 @@ export default function MembersPage() {
 
   const confirmDeletePlayer = async () => {
     if (deletingPlayer) {
-      const success = await deletePlayer(deletingPlayer.id);
-      if (success) {
-        setDeletingPlayer(null);
+      try {
+        const success = await deletePlayer(deletingPlayer.id);
+        setDeletingPlayer(null); // Always close dialog
+        if (!success) {
+          console.error('Failed to delete player');
+        }
+      } catch (error) {
+        setDeletingPlayer(null); // Close dialog even on error
+        console.error('Error deleting player:', error);
       }
     }
   };
@@ -70,28 +75,22 @@ export default function MembersPage() {
     }
   };
 
-  const handleEditTrainer = (trainer: Trainer) => {
-    setEditingTrainer(trainer);
-    setIsTrainerModalOpen(true);
-  };
-
-  const handleUpdateTrainer = async (trainerId: string, trainerData: Omit<Trainer, "id">) => {
-    const success = await updateTrainer(trainerId, trainerData);
-    if (success) {
-      setIsTrainerModalOpen(false);
-      setEditingTrainer(null);
-    }
-  };
-
   const handleDeleteTrainer = (trainer: Trainer) => {
     setDeletingTrainer(trainer);
   };
 
   const confirmDeleteTrainer = async () => {
     if (deletingTrainer) {
-      const success = await deleteTrainer(deletingTrainer.id);
-      if (success) {
-        setDeletingTrainer(null);
+      try {
+        const success = await deleteTrainer(deletingTrainer.id);
+        
+        if (!success) {
+          console.error('Failed to delete trainer');
+        }
+      } catch (error) {
+        console.error('Error deleting trainer:', error);
+      } finally {
+        setDeletingTrainer(null); // Always close dialog in finally block
       }
     }
   };
@@ -102,7 +101,6 @@ export default function MembersPage() {
 
   const handleCloseTrainerModal = () => {
     setIsTrainerModalOpen(false);
-    setEditingTrainer(null);
   };
 
   if (isLoading) {
@@ -189,7 +187,6 @@ export default function MembersPage() {
 
             <TrainersList
               trainers={trainers}
-              onEdit={handleEditTrainer}
               onDelete={handleDeleteTrainer}
             />
           </CardBody>
@@ -210,8 +207,8 @@ export default function MembersPage() {
         isOpen={isTrainerModalOpen}
         onClose={handleCloseTrainerModal}
         onSave={handleAddTrainer}
-        onUpdate={handleUpdateTrainer}
-        editingTrainer={editingTrainer}
+        onUpdate={() => {}}
+        editingTrainer={null}
       />
 
       {/* Delete Player Confirmation */}

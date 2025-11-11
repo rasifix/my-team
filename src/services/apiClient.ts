@@ -23,7 +23,24 @@ class ApiClient {
       throw new Error(`API Error: ${response.status} - ${response.statusText}`);
     }
 
-    return response.json();
+    // Handle empty responses (common for DELETE requests)
+    const contentType = response.headers.get('content-type');
+    if (response.status === 204 || !contentType?.includes('application/json')) {
+      return undefined as T;
+    }
+
+    // Check if response has content
+    const text = await response.text();
+    if (!text) {
+      return undefined as T;
+    }
+
+    try {
+      return JSON.parse(text);
+    } catch (error) {
+      console.warn('Failed to parse JSON response:', text);
+      return undefined as T;
+    }
   }
 
   getGroupEndpoint(path: string): string {

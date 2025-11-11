@@ -8,6 +8,7 @@ import Header from './components/Header';
 import HomePage from './pages/HomePage';
 import MembersPage from './pages/MembersPage';
 import PlayerDetailPage from './pages/PlayerDetailPage';
+import TrainerDetailPage from './pages/TrainerDetailPage';
 import EventsPage from './pages/EventsPage';
 import EventDetailPage from './pages/EventDetailPage';
 import StatisticsPage from './pages/StatisticsPage';
@@ -50,6 +51,8 @@ function App() {
                   <Route path="/trainers" element={<Navigate to="/members/trainers" replace />} />
                   {/* Player detail still needs its own route */}
                   <Route path="/players/:id" element={<PlayerDetailPage />} />
+                  {/* Trainer detail route */}
+                  <Route path="/trainers/:id" element={<TrainerDetailPage />} />
                   <Route path="/events" element={<EventsPage />} />
                   <Route path="/events/:id" element={<EventDetailPage />} />
                   <Route path="/shirts" element={<ShirtSetsPage />} />

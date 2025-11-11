@@ -1,11 +1,21 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useState } from 'react';
 import { downloadDataAsJSON } from '../utils/localStorage';
 
 export default function Header() {
   const location = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleExport = () => {
     downloadDataAsJSON();
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
   };
 
   const navItems = [
@@ -69,9 +79,10 @@ export default function Header() {
           <div className="md:hidden">
             <button
               type="button"
+              onClick={toggleMobileMenu}
               className="bg-orange-700 inline-flex items-center justify-center p-2 rounded-md text-orange-200 hover:text-white hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
               aria-controls="mobile-menu"
-              aria-expanded="false"
+              aria-expanded={isMobileMenuOpen}
             >
               <span className="sr-only">Open main menu</span>
               {/* Menu icon */}
@@ -94,26 +105,38 @@ export default function Header() {
         </div>
 
         {/* Mobile menu */}
-        <div className="md:hidden" id="mobile-menu">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            {navItems.map((item) => {
-              const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                    isActive
-                      ? 'bg-orange-700 text-white'
-                      : 'text-orange-100 hover:bg-orange-500 hover:text-white'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
+        {isMobileMenuOpen && (
+          <div className="md:hidden" id="mobile-menu">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+              {navItems.map((item) => {
+                const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={closeMobileMenu}
+                    className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                      isActive
+                        ? 'bg-orange-700 text-white'
+                        : 'text-orange-100 hover:bg-orange-500 hover:text-white'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+              <button
+                onClick={() => {
+                  handleExport();
+                  closeMobileMenu();
+                }}
+                className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-orange-100 hover:bg-orange-500 hover:text-white transition-colors"
+              >
+                Export
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </header>
   );

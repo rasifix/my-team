@@ -353,13 +353,13 @@ export default function EventDetailPage() {
               onClick={() => setIsEditEventModalOpen(true)}
               className="text-blue-600 hover:text-blue-700 text-sm font-medium"
             >
-              Edit Event
+              Edit
             </button>
             <button 
               onClick={handleDeleteEvent}
               className="text-red-600 hover:text-red-700 text-sm font-medium"
             >
-              Delete Event
+              Delete
             </button>
           </div>
         </div>
