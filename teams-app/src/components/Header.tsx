@@ -1,17 +1,11 @@
 import { Link, useLocation } from 'react-router-dom';
-import { useState, useRef } from 'react';
 import { downloadDataAsJSON } from '../utils/localStorage';
 
 export default function Header() {
   const location = useLocation();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleExport = () => {
     downloadDataAsJSON();
-  };
-
-  const handleImportClick = () => {
-    fileInputRef.current?.click();
   };
 
   const navItems = [

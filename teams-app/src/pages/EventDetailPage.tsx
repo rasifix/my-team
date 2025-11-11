@@ -10,7 +10,6 @@ import EditEventModal from '../components/EditEventModal';
 import ConfirmDialog from '../components/ConfirmDialog';
 import TeamCard from '../components/TeamCard';
 import TeamPrintSummary from '../components/TeamPrintSummary';
-import { autoSelectTeams } from '../utils/selectionAlgorithm';
 import { formatDate } from '../utils/dateFormatter';
 
 export default function EventDetailPage() {
@@ -161,28 +160,6 @@ export default function EventDetailPage() {
     const updatedInvitations = event.invitations.filter(inv => inv.id !== invitationId);
 
     await updateEvent(id, { invitations: updatedInvitations });
-    // Store will automatically update the event data
-  };
-
-  const handleAutoSelect = async () => {
-    if (!event || !id) return;
-
-    const acceptedCount = event.invitations.filter(inv => inv.status === 'accepted').length;
-    
-    if (acceptedCount === 0) {
-      alert('No players have accepted the invitation yet.');
-      return;
-    }
-
-    if (event.teams.length === 0) {
-      alert('No teams configured for this event.');
-      return;
-    }
-
-    // Run auto-selection algorithm
-    const updatedTeams = autoSelectTeams(event);
-    
-    await updateEvent(id, { teams: updatedTeams });
     // Store will automatically update the event data
   };
 
@@ -453,7 +430,6 @@ export default function EventDetailPage() {
           onInviteClick={() => setIsInviteModalOpen(true)}
           onStatusChange={handleInvitationStatusChange}
           onRemoveInvitation={handleRemoveInvitation}
-          onAutoSelect={handleAutoSelect}
           assignedPlayerIds={event.teams.flatMap(team => team.selectedPlayers || [])}
         />
       </div>

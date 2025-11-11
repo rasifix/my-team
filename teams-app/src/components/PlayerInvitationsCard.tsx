@@ -11,7 +11,6 @@ interface PlayerInvitationsCardProps {
   onInviteClick: () => void;
   onStatusChange: (invitationId: string, newStatus: 'open' | 'accepted' | 'declined') => void;
   onRemoveInvitation: (invitationId: string) => void;
-  onAutoSelect?: () => void;
   assignedPlayerIds?: string[];
 }
 
@@ -23,7 +22,6 @@ export default function PlayerInvitationsCard({
   onInviteClick,
   onStatusChange,
   onRemoveInvitation,
-  onAutoSelect,
   assignedPlayerIds = [],
 }: PlayerInvitationsCardProps) {
   const [showOnlyAvailable, setShowOnlyAvailable] = useState(true);
@@ -82,15 +80,6 @@ export default function PlayerInvitationsCard({
             >
               Invite Players
             </button>
-            {onAutoSelect && (
-              <button 
-                onClick={onAutoSelect}
-                disabled={acceptedCount === 0}
-                className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-sm disabled:bg-gray-300 disabled:cursor-not-allowed"
-              >
-                Auto Select
-              </button>
-            )}
           </div>
         </div>
       </div>
