@@ -72,7 +72,7 @@ export default function PlayersList({ players, onDelete }: PlayersListProps) {
       {players.map((player) => (
         <div 
           key={player.id}
-          className="relative overflow-hidden bg-white border border-gray-200 rounded-lg"
+          className="relative overflow-hidden bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow"
         >
           {/* Main row content */}
           <div 

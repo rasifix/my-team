@@ -23,7 +23,7 @@ export default function ShirtSetCard({
   onRemoveShirt,
 }: ShirtSetCardProps) {
   return (
-    <div className={`border-l-4 card hover:shadow-lg transition-shadow`} style={{ borderLeftColor: shirtSet.color }}>
+    <div className={`border-l-4 card hover:shadow-md transition-shadow`} style={{ borderLeftColor: shirtSet.color }}>
       <div className="card-body">
         <div className="flex justify-between items-start">
           <div className="flex-1">
