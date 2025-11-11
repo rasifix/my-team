@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import ErrorBoundary from './components/ErrorBoundary';
 import ApiErrorBoundary from './components/ApiErrorBoundary';
@@ -6,9 +6,8 @@ import AppInitializer from './components/AppInitializer';
 import { ApiStatus } from './components/ApiStatus';
 import Header from './components/Header';
 import HomePage from './pages/HomePage';
-import PlayersPage from './pages/PlayersPage';
+import MembersPage from './pages/MembersPage';
 import PlayerDetailPage from './pages/PlayerDetailPage';
-import TrainersPage from './pages/TrainersPage';
 import EventsPage from './pages/EventsPage';
 import EventDetailPage from './pages/EventDetailPage';
 import StatisticsPage from './pages/StatisticsPage';
@@ -42,9 +41,15 @@ function App() {
               <main>
                 <Routes>
                   <Route path="/" element={<HomePage />} />
-                  <Route path="/players" element={<PlayersPage />} />
+                  {/* Members routes */}
+                  <Route path="/members" element={<Navigate to="/members/players" replace />} />
+                  <Route path="/members/players" element={<MembersPage />} />
+                  <Route path="/members/trainers" element={<MembersPage />} />
+                  {/* Redirect old routes to new members structure */}
+                  <Route path="/players" element={<Navigate to="/members/players" replace />} />
+                  <Route path="/trainers" element={<Navigate to="/members/trainers" replace />} />
+                  {/* Player detail still needs its own route */}
                   <Route path="/players/:id" element={<PlayerDetailPage />} />
-                  <Route path="/trainers" element={<TrainersPage />} />
                   <Route path="/events" element={<EventsPage />} />
                   <Route path="/events/:id" element={<EventDetailPage />} />
                   <Route path="/shirts" element={<ShirtSetsPage />} />

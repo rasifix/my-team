@@ -26,11 +26,10 @@ This is a React + Vite + TypeScript application for managing fair soccer team se
 
 ## Key Pages & Features
 - **HomePage**: Navigation hub and application overview
-- **PlayersPage**: Player CRUD operations, level editing, automatic alphabetical sorting
-- **PlayersDetailPage**: Individual player statistics and event history
+- **MembersPage**: Combined player and trainer management with tabbed interface, automatic alphabetical sorting
+- **PlayerDetailPage**: Individual player statistics and event history
 - **EventsPage**: Event listing, management, automatic chronological sorting
 - **EventDetailPage**: Complex team management, player invitations, selection process
-- **TrainersPage**: Trainer management with alphabetical sorting
 - **ShirtSetsPage**: Shirt set management sorted by sponsor and color
 - **StatisticsPage**: Attendance tracking and fairness metrics
 - **PlayerStatisticsPage**: Individual player performance analytics
@@ -62,12 +61,16 @@ When implementing:
 - Player replacement and switching between teams
 - Event attendance matrix visualization
 - Individual player performance tracking
+- Unified member management with tabbed interface for players and trainers
 
 ## File Structure (current implementation)
 ```
 src/
 ├── components/         # Reusable UI components and modals
 ├── pages/             # Main page components using store hooks
+│   ├── MembersPage.tsx # Combined players and trainers with tabs
+│   ├── EventDetailPage.tsx # Complex team management
+│   └── ...            # Other page components
 ├── types/             # TypeScript interfaces for all domain models
 ├── services/          # API service layers for backend communication
 ├── store/             # Zustand store implementation and selectors
