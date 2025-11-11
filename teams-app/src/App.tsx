@@ -19,7 +19,7 @@ function App() {
   // API health check on startup
   useEffect(() => {
     // Add API health check instead of migrations
-    fetch('/api/health')
+    fetch('/health')
       .then(response => {
         if (!response.ok) {
           console.warn('API not available, some features may not work');

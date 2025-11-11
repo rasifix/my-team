@@ -1,14 +1,14 @@
-import { getPlayerById } from '../services/playerService';
-import { getTrainerById } from '../services/trainerService';
-import { getShirtSetById } from '../services/shirtService';
 import { getPlayerStats } from '../utils/playerStats';
-import type { Team } from '../types';
+import type { Team, Player, Trainer, ShirtSet, Event } from '../types';
 import Level from './Level';
 import Strength from './Strength';
-import { useEvents } from '../hooks/useEvents';
 
 interface TeamCardProps {
   team: Team;
+  players: Player[];
+  trainers: Trainer[];
+  shirtSets: ShirtSet[];
+  events: Event[];
   maxPlayersPerTeam: number;
   isDragOver: boolean;
   dragOverPlayerId: string | null;
@@ -24,6 +24,10 @@ interface TeamCardProps {
 
 export default function TeamCard({
   team,
+  players,
+  trainers,
+  shirtSets,
+  events,
   maxPlayersPerTeam,
   isDragOver,
   dragOverPlayerId,
@@ -42,14 +46,12 @@ export default function TeamCard({
   // Calculate average player level
   const averageLevel = selectedPlayers.length > 0 
     ? selectedPlayers.reduce((sum, playerId) => {
-        const player = getPlayerById(playerId);
+        const player = players.find(p => p.id === playerId);
         return sum + (player?.level || 0);
       }, 0) / selectedPlayers.length
     : 0;
-  const trainer = team.trainerId ? getTrainerById(team.trainerId) : null;
-  const shirtSet = team.shirtSetId ? getShirtSetById(team.shirtSetId) : null;
-
-  const { events } = useEvents();
+  const trainer = team.trainerId ? trainers.find(t => t.id === team.trainerId) : null;
+  const shirtSet = team.shirtSetId ? shirtSets.find(s => s.id === team.shirtSetId) : null;
 
   return (
     <div 
@@ -130,7 +132,7 @@ export default function TeamCard({
           <h4 className="text-xs font-medium text-gray-500 mb-2">Players {selectedPlayers.length} / {maxPlayersPerTeam} <span className='text-yellow-500'>★</span> {averageLevel.toFixed(1)}</h4>
           <div className="space-y-1">
             {selectedPlayers
-              .map(playerId => ({ playerId, player: getPlayerById(playerId) }))
+              .map(playerId => ({ playerId, player: players.find(p => p.id === playerId) }))
               .sort((a, b) => {
                 if (!a.player || !b.player) return 0;
                 const lastNameCompare = a.player.lastName.toLowerCase().localeCompare(b.player.lastName.toLowerCase());

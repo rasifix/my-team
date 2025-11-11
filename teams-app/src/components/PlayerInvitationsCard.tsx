@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { getPlayerById } from '../services/playerService';
 import { getPlayerStats } from '../utils/playerStats';
-import { useEvents } from '../hooks/useEvents';
-import type { Invitation, Event } from '../types';
+import type { Invitation, Event, Player } from '../types';
 import Level from './Level';
 
 interface PlayerInvitationsCardProps {
   invitations: Invitation[];
   currentEvent: Event;
+  players: Player[];
+  events: Event[];
   onInviteClick: () => void;
   onStatusChange: (invitationId: string, newStatus: 'open' | 'accepted' | 'declined') => void;
   onRemoveInvitation: (invitationId: string) => void;
@@ -18,6 +18,8 @@ interface PlayerInvitationsCardProps {
 export default function PlayerInvitationsCard({
   invitations,
   currentEvent,
+  players,
+  events,
   onInviteClick,
   onStatusChange,
   onRemoveInvitation,
@@ -25,12 +27,11 @@ export default function PlayerInvitationsCard({
   assignedPlayerIds = [],
 }: PlayerInvitationsCardProps) {
   const [showOnlyAvailable, setShowOnlyAvailable] = useState(true);
-  const { events } = useEvents();
 
   // Function to calculate real-time statistics including current event state
   const getPlayerStatsWithCurrent = (playerId: string) => {
     // Get historical stats from all events except current one
-    const historicalEvents = events.filter(e => e.id !== currentEvent.id);
+    const historicalEvents = events.filter((e: Event) => e.id !== currentEvent.id);
     const historicalStats = getPlayerStats(playerId, historicalEvents);
     
     // Check current event status
@@ -122,8 +123,8 @@ export default function PlayerInvitationsCard({
         <div className="space-y-2">
           {[...filteredInvitations]
             .sort((a, b) => {
-              const playerA = getPlayerById(a.playerId);
-              const playerB = getPlayerById(b.playerId);
+              const playerA = players.find(p => p.id === a.playerId);
+              const playerB = players.find(p => p.id === b.playerId);
               
               if (!playerA || !playerB) return 0;
               
@@ -133,7 +134,7 @@ export default function PlayerInvitationsCard({
               return playerA.firstName.toLowerCase().localeCompare(playerB.firstName.toLowerCase());
             })
             .map((invitation) => {
-            const player = getPlayerById(invitation.playerId);
+            const player = players.find(p => p.id === invitation.playerId);
             const isAccepted = invitation.status === 'accepted';
             const isAssigned = assignedPlayerIds.includes(invitation.playerId);
             const isDraggable = isAccepted && !isAssigned;

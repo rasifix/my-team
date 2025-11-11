@@ -11,7 +11,7 @@ export function ApiStatus({ className = '' }: ApiStatusProps) {
   const checkApiHealth = async () => {
     setIsChecking(true);
     try {
-      const response = await fetch('/api/health', {
+      const response = await fetch('/health', {
         method: 'GET',
         timeout: 5000, // 5 second timeout
       } as RequestInit);

@@ -259,7 +259,7 @@ function App() {
   useEffect(() => {
     // Remove localStorage migration logic
     // Add API health check instead
-    fetch('/api/health')
+    fetch('/health')
       .then(response => {
         if (!response.ok) {
           console.warn('API not available, some features may not work');

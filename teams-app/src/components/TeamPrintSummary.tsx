@@ -1,17 +1,25 @@
-import { getPlayerById } from '../services/playerService';
-import { getTrainerById } from '../services/trainerService';
-import { getShirtSetById } from '../services/shirtService';
 import { formatDate } from '../utils/dateFormatter';
-import type { Event, Team } from '../types';
+import type { Event, Team, Player, Trainer, ShirtSet } from '../types';
 
 interface TeamPrintSummaryProps {
   event: Event;
   teams: Team[];
+  players: Player[];
+  trainers: Trainer[];
+  shirtSets: ShirtSet[];
   isOpen: boolean;
   onClose: () => void;
 }
 
-export default function TeamPrintSummary({ event, teams, isOpen, onClose }: TeamPrintSummaryProps) {
+export default function TeamPrintSummary({ 
+  event, 
+  teams, 
+  players, 
+  trainers, 
+  shirtSets, 
+  isOpen, 
+  onClose 
+}: TeamPrintSummaryProps) {
   if (!isOpen) return null;
 
   const handlePrint = () => {
@@ -50,10 +58,10 @@ export default function TeamPrintSummary({ event, teams, isOpen, onClose }: Team
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {teams.map((team) => {
               const selectedPlayers = team.selectedPlayers || [];
-              const trainer = team.trainerId ? getTrainerById(team.trainerId) : null;
-              const shirtSet = team.shirtSetId ? getShirtSetById(team.shirtSetId) : null;
+              const trainer = team.trainerId ? trainers.find(t => t.id === team.trainerId) : null;
+              const shirtSet = team.shirtSetId ? shirtSets.find(s => s.id === team.shirtSetId) : null;
               const playersData = selectedPlayers
-                .map(playerId => getPlayerById(playerId))
+                .map(playerId => players.find(p => p.id === playerId))
                 .filter(Boolean)
                 .sort((a, b) => {
                   const lastNameCompare = a!.lastName.toLowerCase().localeCompare(b!.lastName.toLowerCase());

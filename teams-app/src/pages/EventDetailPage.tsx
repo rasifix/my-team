@@ -20,10 +20,10 @@ import { formatDate } from '../utils/dateFormatter';
 export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { updateEvent, deleteEvent } = useEvents();
+  const { updateEvent, deleteEvent, events } = useEvents();
   const { players } = usePlayers();
   // Initialize hooks for child components
-  useTrainers();
+  const { trainers } = useTrainers();
   const { shirtSets } = useShirtSets();
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
@@ -506,6 +506,10 @@ export default function EventDetailPage() {
                   <TeamCard
                     key={team.id}
                     team={team}
+                    players={players}
+                    trainers={trainers}
+                    shirtSets={shirtSets}
+                    events={events}
                     maxPlayersPerTeam={event.maxPlayersPerTeam}
                     isDragOver={isDragOver}
                     dragOverPlayerId={dragOverPlayerId}
@@ -528,6 +532,8 @@ export default function EventDetailPage() {
         <PlayerInvitationsCard
           invitations={event.invitations}
           currentEvent={event}
+          players={players}
+          events={events}
           onInviteClick={() => setIsInviteModalOpen(true)}
           onStatusChange={handleInvitationStatusChange}
           onRemoveInvitation={handleRemoveInvitation}
@@ -593,6 +599,9 @@ export default function EventDetailPage() {
       <TeamPrintSummary
         event={event}
         teams={event.teams}
+        players={players}
+        trainers={trainers}
+        shirtSets={shirtSets}
         isOpen={isPrintSummaryOpen}
         onClose={() => setIsPrintSummaryOpen(false)}
       />
