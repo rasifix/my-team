@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Player } from '../types';
-import * as playerService from '../services/playerService';
+import * as memberService from '../services/memberService';
 
 // Helper function to sort players by lastName, then by firstName
 function sortPlayers(players: Player[]): Player[] {
@@ -24,7 +24,7 @@ export function usePlayers() {
   const loadPlayers = async () => {
     try {
       setLoading(true);
-      const apiPlayers = await playerService.getPlayers();
+      const apiPlayers = await memberService.getPlayers();
       setPlayers(sortPlayers(apiPlayers));
       setError(null);
     } catch (err) {
@@ -41,7 +41,7 @@ export function usePlayers() {
 
   const handleAddPlayer = async (playerData: Omit<Player, 'id'>): Promise<boolean> => {
     try {
-      await playerService.addPlayer(playerData);
+      await memberService.addPlayer(playerData);
       await loadPlayers(); // Refresh from API
       setError(null);
       return true;
@@ -54,7 +54,7 @@ export function usePlayers() {
 
   const handleUpdatePlayer = async (playerId: string, updates: Partial<Omit<Player, 'id'>>): Promise<boolean> => {
     try {
-      await playerService.updatePlayer(playerId, updates);
+      await memberService.updatePlayer(playerId, updates);
       await loadPlayers(); // Refresh from API
       setError(null);
       return true;
@@ -67,7 +67,7 @@ export function usePlayers() {
 
   const handleDeletePlayer = async (playerId: string): Promise<boolean> => {
     try {
-      await playerService.deletePlayer(playerId);
+      await memberService.deletePlayer(playerId);
       await loadPlayers(); // Refresh from API
       setError(null);
       return true;

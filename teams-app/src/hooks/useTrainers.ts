@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Trainer } from '../types';
-import * as trainerService from '../services/trainerService';
+import * as memberService from '../services/memberService';
 
 // Helper function to sort trainers by lastName, then by firstName
 function sortTrainers(trainers: Trainer[]): Trainer[] {
@@ -24,7 +24,7 @@ export function useTrainers() {
   const loadTrainers = async () => {
     try {
       setLoading(true);
-      const apiTrainers = await trainerService.getTrainers();
+      const apiTrainers = await memberService.getTrainers();
       setTrainers(sortTrainers(apiTrainers));
       setError(null);
     } catch (err) {
@@ -41,7 +41,7 @@ export function useTrainers() {
 
   const handleAddTrainer = async (trainerData: Omit<Trainer, 'id'>): Promise<boolean> => {
     try {
-      await trainerService.addTrainer(trainerData);
+      await memberService.addTrainer(trainerData);
       await loadTrainers(); // Refresh from API
       setError(null);
       return true;
@@ -54,7 +54,7 @@ export function useTrainers() {
 
   const handleUpdateTrainer = async (trainerId: string, updates: Partial<Omit<Trainer, 'id'>>): Promise<boolean> => {
     try {
-      await trainerService.updateTrainer(trainerId, updates);
+      await memberService.updateTrainer(trainerId, updates);
       await loadTrainers(); // Refresh from API
       setError(null);
       return true;
@@ -67,7 +67,7 @@ export function useTrainers() {
 
   const handleDeleteTrainer = async (trainerId: string): Promise<boolean> => {
     try {
-      await trainerService.deleteTrainer(trainerId);
+      await memberService.deleteTrainer(trainerId);
       await loadTrainers(); // Refresh from API
       setError(null);
       return true;

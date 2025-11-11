@@ -3,9 +3,8 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import type { Player, Event, Trainer, ShirtSet, Team } from '../types';
 import { getPlayerStats } from '../utils/playerStats';
-import { getPlayers, addPlayer as addPlayerService, updatePlayer as updatePlayerService, deletePlayer as deletePlayerService } from '../services/playerService';
+import { getAllMembers, addPlayer as addPlayerService, updatePlayer as updatePlayerService, deletePlayer as deletePlayerService, addTrainer as addTrainerService, updateTrainer as updateTrainerService, deleteTrainer as deleteTrainerService } from '../services/memberService';
 import { getEvents, addEvent as addEventService, updateEvent as updateEventService, deleteEvent as deleteEventService } from '../services/eventService';
-import { getTrainers, addTrainer as addTrainerService, updateTrainer as updateTrainerService, deleteTrainer as deleteTrainerService } from '../services/trainerService';
 import { getShirtSets, addShirtSet as addShirtSetService, updateShirtSet as updateShirtSetService, deleteShirtSet as deleteShirtSetService, addShirtToSet as addShirtToSetService, removeShirtFromSet as removeShirtFromSetService, updateShirt as updateShirtService } from '../services/shirtService';
 
 // Helper function to sort players alphabetically by lastName + firstName
@@ -156,9 +155,8 @@ export const useStore = create<AppState>()(
         // Load all data in parallel
         const loadData = async () => {
           const results = await Promise.allSettled([
-            getPlayers().then((players: Player[]) => ({ type: 'players' as const, data: players })),
+            getAllMembers().then((members) => ({ type: 'members' as const, data: members })),
             getEvents().then((events: Event[]) => ({ type: 'events' as const, data: events })),
-            getTrainers().then((trainers: Trainer[]) => ({ type: 'trainers' as const, data: trainers })),
             getShirtSets().then((shirtSets: ShirtSet[]) => ({ type: 'shirtSets' as const, data: shirtSets })),
           ]);
           
@@ -184,14 +182,28 @@ export const useStore = create<AppState>()(
           results.forEach((result, index) => {
             if (result.status === 'fulfilled') {
               const { type, data } = result.value;
-              if (type === 'players') newState.players = sortPlayers(data as Player[]);
-              else if (type === 'events') newState.events = sortEvents(data as Event[]);
-              else if (type === 'trainers') newState.trainers = sortTrainers(data as Trainer[]);
-              else if (type === 'shirtSets') newState.shirtSets = sortShirtSets(data as ShirtSet[]);
+              if (type === 'members') {
+                const membersData = data as { players: Player[], trainers: Trainer[] };
+                newState.players = sortPlayers(membersData.players);
+                newState.trainers = sortTrainers(membersData.trainers);
+              } else if (type === 'events') {
+                newState.events = sortEvents(data as Event[]);
+              } else if (type === 'shirtSets') {
+                newState.shirtSets = sortShirtSets(data as ShirtSet[]);
+              }
             } else {
-              const types = ['players', 'events', 'trainers', 'shirtSets'] as const;
-              const type = types[index];
-              newState.errors[type] = result.reason?.message || 'Failed to load data';
+              // Map index to appropriate error handling
+              if (index === 0) {
+                // Members call failed - set error for both players and trainers
+                newState.errors.players = result.reason?.message || 'Failed to load members';
+                newState.errors.trainers = result.reason?.message || 'Failed to load members';
+              } else if (index === 1) {
+                // Events call failed
+                newState.errors.events = result.reason?.message || 'Failed to load events';
+              } else if (index === 2) {
+                // ShirtSets call failed
+                newState.errors.shirtSets = result.reason?.message || 'Failed to load shirt sets';
+              }
             }
           });
           
