@@ -40,7 +40,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         repository: rasifix/teams-app-site
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.DEPLOY_TOKEN }}
         path: teams-app-site
         
     - name: Download build artifacts
