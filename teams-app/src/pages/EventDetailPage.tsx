@@ -24,8 +24,10 @@ export default function EventDetailPage() {
   const { players } = usePlayers();
   // Initialize hooks for child components
   useTrainers();
-  useShirtSets();
+  const { shirtSets } = useShirtSets();
   const [event, setEvent] = useState<Event | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isEditTeamModalOpen, setIsEditTeamModalOpen] = useState(false);
   const [isAssignShirtsModalOpen, setIsAssignShirtsModalOpen] = useState(false);
@@ -39,8 +41,20 @@ export default function EventDetailPage() {
 
   useEffect(() => {
     if (id) {
-      const loadedEvent = getEventById(id);
-      setEvent(loadedEvent);
+      const loadEvent = async () => {
+        try {
+          setLoading(true);
+          setError(null);
+          const loadedEvent = await getEventById(id);
+          setEvent(loadedEvent);
+        } catch (err) {
+          setError('Failed to load event from server');
+          console.error('Error loading event:', err);
+        } finally {
+          setLoading(false);
+        }
+      };
+      loadEvent();
     }
   }, [id]);
 
@@ -395,6 +409,32 @@ export default function EventDetailPage() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="page-container">
+        <div className="empty-state">
+          <p>Loading event...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="page-container">
+        <div className="empty-state">
+          <p className="text-red-600">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="mt-4 btn-primary btn-sm"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (!event) {
     return (
       <div className="page-container">
@@ -520,6 +560,8 @@ export default function EventDetailPage() {
           onClose={() => setIsAssignShirtsModalOpen(false)}
           onSave={handleSaveShirtAssignments}
           team={assigningShirtsTeam}
+          players={players}
+          shirtSets={shirtSets}
           currentShirtSetId={assigningShirtsTeam?.shirtSetId}
           currentShirtAssignments={assigningShirtsTeam?.shirtAssignments}
         />

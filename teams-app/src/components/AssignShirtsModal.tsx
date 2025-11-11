@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react';
-import { useShirtSets } from '../hooks/useShirtSets';
-import { getShirtSetById } from '../services/shirtService';
-import type { Team, ShirtSet } from '../types';
+import type { Team, ShirtSet, Player } from '../types';
 import { Modal, ModalBody, ModalFooter, ModalHeader } from './ui/Modal';
 import Button from './ui/Button';
-import { getPlayerById } from '../services/playerService';
 
 interface AssignShirtsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (shirtSetId: string, playerShirtAssignments: Array<{ playerId: string; shirtNumber: number }>) => void;
   team: Team;
+  players: Player[];
+  shirtSets: ShirtSet[];
   currentShirtSetId?: string;
   currentShirtAssignments?: Array<{ playerId: string; shirtNumber: number }>;
 }
@@ -20,6 +19,8 @@ export default function AssignShirtsModal({
   onClose,
   onSave,
   team,
+  players,
+  shirtSets,
   currentShirtSetId,
   currentShirtAssignments,
 }: AssignShirtsModalProps) {
@@ -27,15 +28,13 @@ export default function AssignShirtsModal({
   const [selectedShirtSet, setSelectedShirtSet] = useState<ShirtSet | null>(null);
   const [playerShirtAssignments, setPlayerShirtAssignments] = useState<Array<{ playerId: string; shirtNumber: number }>>([]);
 
-  const { shirtSets } = useShirtSets();
-
   useEffect(() => {
     setSelectedShirtSetId(currentShirtSetId || '');
   }, [currentShirtSetId, isOpen]);
 
   useEffect(() => {
     if (selectedShirtSetId) {
-      const shirtSet = getShirtSetById(selectedShirtSetId);
+      const shirtSet = shirtSets.find(s => s.id === selectedShirtSetId) || null;
       setSelectedShirtSet(shirtSet);
       
       // Initialize assignments - use existing assignments or empty for new players
@@ -51,7 +50,7 @@ export default function AssignShirtsModal({
       setSelectedShirtSet(null);
       setPlayerShirtAssignments([]);
     }
-  }, [selectedShirtSetId, team.selectedPlayers, currentShirtAssignments]);
+  }, [selectedShirtSetId, team.selectedPlayers, currentShirtAssignments, shirtSets]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,7 +113,7 @@ export default function AssignShirtsModal({
                 <h3 className="text-lg font-medium mb-4">Assign Shirts to Players</h3>
                 <div className="space-y-2 max-h-80 overflow-y-auto">
                   {team.selectedPlayers.map(playerId => {
-                    const player = getPlayerById(playerId);
+                    const player = players.find(p => p.id === playerId);
                     const currentAssignment = playerShirtAssignments.find(a => a.playerId === playerId);
                     
                     if (!player) return null;

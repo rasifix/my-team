@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useEffect } from 'react';
 import ErrorBoundary from './components/ErrorBoundary';
 import ApiErrorBoundary from './components/ApiErrorBoundary';
-import ApiStatus from './components/ApiStatus';
+import { ApiStatus } from './components/ApiStatus';
 import Header from './components/Header';
 import HomePage from './pages/HomePage';
 import PlayersPage from './pages/PlayersPage';

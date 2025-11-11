@@ -18,15 +18,53 @@ export default function PlayerDetailPage() {
   const { events, updateEvent } = useEvents();
   const { updatePlayer, deletePlayer } = usePlayers();
   const [player, setPlayer] = useState<Player | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
   useEffect(() => {
-    if (id) {
-      const loadedPlayer = getPlayerById(id);
-      setPlayer(loadedPlayer);
-    }
+    const loadPlayer = async () => {
+      if (!id) {
+        setError('No player ID provided');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+        const loadedPlayer = await getPlayerById(id);
+        setPlayer(loadedPlayer);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load player');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPlayer();
   }, [id]);
+
+  if (loading) {
+    return (
+      <div className="page-container">
+        <div className="empty-state">
+          <p>Loading player...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="page-container">
+        <div className="empty-state">
+          <p>Error: {error}</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!player) {
     return (
