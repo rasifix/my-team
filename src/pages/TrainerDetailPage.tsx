@@ -19,25 +19,25 @@ interface TrainerEventHistoryItem {
 export default function TrainerDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  
+
   // Use store hooks
   const { events } = useEvents();
   const { updateTrainer, deleteTrainer, getTrainerById } = useTrainers();
   const isLoading = useAppLoading();
   const hasErrors = useAppHasErrors();
   const errors = useAppErrors();
-  
+
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
   // Get trainer from store
   const trainer = id ? getTrainerById(id) : null;
-  
+
   // Determine loading and error states
   const loading = isLoading;
-  const error = !id ? 'No trainer ID provided' : 
-               (!trainer && !loading) ? 'Trainer not found' :
-               errors.trainers || (hasErrors ? 'Failed to load data' : null);
+  const error = !id ? 'No trainer ID provided' :
+    (!trainer && !loading) ? 'Trainer not found' :
+      errors.trainers || (hasErrors ? 'Failed to load data' : null);
 
   if (loading) {
     return (
@@ -127,31 +127,35 @@ export default function TrainerDetailPage() {
   return (
     <div className="page-container">
       <div className="page-header">
-        <button 
-          onClick={() => navigate('/members/trainers')}
-          className="text-blue-600 hover:text-blue-700 text-sm font-medium mb-2"
-        >
-          ← Back to Trainers
-        </button>
-        <div className="flex justify-between items-start gap-4">
-          <div className="flex items-center gap-4 flex-1">
-            <h1 className="page-title">{trainer.firstName} {trainer.lastName}</h1>
-            <span className="text-gray-600 text-sm bg-gray-100 px-2 py-1 rounded">Trainer</span>
-          </div>
+        <div className="flex justify-between items-center mb-2">
+          <button
+            onClick={() => navigate('/members/trainers')}
+            className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+          >
+            ← Back to Trainers
+          </button>
           <div className="flex gap-3">
-            <button 
+            <button
               onClick={handleEditTrainer}
               className="text-blue-600 hover:text-blue-700 text-sm font-medium"
             >
               Edit
             </button>
-            <button 
+            <button
               onClick={handleDeleteTrainer}
               className="text-red-600 hover:text-red-700 text-sm font-medium"
             >
               Delete
             </button>
           </div>
+        </div>
+        <div className="flex justify-between items-start gap-4">
+          <div className="flex items-center gap-4 flex-1">
+            <h1 className="page-title">{trainer.firstName} {trainer.lastName}</h1>
+          </div>
+        </div>
+        <div>
+          <span className="text-gray-600 text-sm bg-gray-100 px-2 py-1 rounded">Trainer</span>
         </div>
       </div>
 
@@ -166,7 +170,7 @@ export default function TrainerDetailPage() {
               </p>
               <div className="space-y-3">
                 {trainerEventHistory.map((item) => (
-                  <div 
+                  <div
                     key={item.eventId}
                     className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
                     onClick={() => navigate(`/events/${item.eventId}`)}
@@ -214,7 +218,7 @@ export default function TrainerDetailPage() {
       <AddTrainerModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        onSave={() => {}}
+        onSave={() => { }}
         onUpdate={handleUpdateTrainer}
         editingTrainer={trainer}
       />
