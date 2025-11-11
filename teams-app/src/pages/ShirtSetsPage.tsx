@@ -113,9 +113,10 @@ export default function ShirtSetsPage() {
             </CardTitle>
             <Button
               variant="primary"
+              size="sm"
               onClick={() => setIsAddModalOpen(true)}
             >
-              Add Shirt Set
+              Add
             </Button>
           </div>
 

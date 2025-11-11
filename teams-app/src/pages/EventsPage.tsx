@@ -70,10 +70,11 @@ export default function EventsPage() {
           <div className="flex justify-between items-center mb-4">
             <CardTitle>All Events ({events.length})</CardTitle>
             <Button 
-              variant="success"
+              variant="primary"
+              size="sm"
               onClick={() => setIsModalOpen(true)}
             >
-              Create Event
+              Add
             </Button>
           </div>
           
