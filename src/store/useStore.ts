@@ -1,11 +1,13 @@
 
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import type { Player, Event, Trainer, ShirtSet, Team } from '../types';
+import type { Player, Event, Trainer, ShirtSet, Team, Group } from '../types';
 import { getPlayerStats } from '../utils/playerStats';
 import { getAllMembers, addPlayer as addPlayerService, updatePlayer as updatePlayerService, deletePlayer as deletePlayerService, addTrainer as addTrainerService, updateTrainer as updateTrainerService, deleteTrainer as deleteTrainerService } from '../services/memberService';
 import { getEvents, addEvent as addEventService, updateEvent as updateEventService, deleteEvent as deleteEventService } from '../services/eventService';
 import { getShirtSets, addShirtSet as addShirtSetService, updateShirtSet as updateShirtSetService, deleteShirtSet as deleteShirtSetService, addShirtToSet as addShirtToSetService, removeShirtFromSet as removeShirtFromSetService, updateShirt as updateShirtService } from '../services/shirtService';
+import { getGroup } from '../services/groupService';
+import { API_CONFIG } from '../config/api';
 
 // Helper function to sort players alphabetically by lastName + firstName
 const sortPlayers = (players: Player[]): Player[] => {
@@ -47,6 +49,7 @@ const sortShirtSets = (shirtSets: ShirtSet[]): ShirtSet[] => {
 
 interface AppState {
   // Data
+  group: Group | null;
   players: Player[];
   events: Event[];
   trainers: Trainer[];
@@ -54,6 +57,7 @@ interface AppState {
   
   // Loading states
   loading: {
+    group: boolean;
     players: boolean;
     events: boolean;
     trainers: boolean;
@@ -62,6 +66,7 @@ interface AppState {
   
   // Error states
   errors: {
+    group: string | null;
     players: string | null;
     events: string | null;
     trainers: string | null;
@@ -114,18 +119,21 @@ export const useStore = create<AppState>()(
   devtools(
     (set, get) => ({
       // Initial state
+      group: null,
       players: [],
       events: [],
       trainers: [],
       shirtSets: [],
       isInitialized: false,
       loading: {
+        group: false,
         players: false,
         events: false,
         trainers: false,
         shirtSets: false,
       },
       errors: {
+        group: null,
         players: null,
         events: null,
         trainers: null,
@@ -139,12 +147,14 @@ export const useStore = create<AppState>()(
         // Set all loading states
         set({
           loading: {
+            group: true,
             players: true,
             events: true,
             trainers: true,
             shirtSets: true,
           },
           errors: {
+            group: null,
             players: null,
             events: null,
             trainers: null,
@@ -155,6 +165,7 @@ export const useStore = create<AppState>()(
         // Load all data in parallel
         const loadData = async () => {
           const results = await Promise.allSettled([
+            getGroup(API_CONFIG.defaultGroupId).then((group: Group) => ({ type: 'group' as const, data: group })),
             getAllMembers().then((members) => ({ type: 'members' as const, data: members })),
             getEvents().then((events: Event[]) => ({ type: 'events' as const, data: events })),
             getShirtSets().then((shirtSets: ShirtSet[]) => ({ type: 'shirtSets' as const, data: shirtSets })),
@@ -162,17 +173,20 @@ export const useStore = create<AppState>()(
           
           const newState = {
             loading: {
+              group: false,
               players: false,
               events: false,
               trainers: false,
               shirtSets: false,
             },
             errors: {
+              group: null,
               players: null,
               events: null,
               trainers: null,
               shirtSets: null,
             },
+            group: state.group,
             players: state.players,
             events: state.events,
             trainers: state.trainers,
@@ -182,7 +196,9 @@ export const useStore = create<AppState>()(
           results.forEach((result, index) => {
             if (result.status === 'fulfilled') {
               const { type, data } = result.value;
-              if (type === 'members') {
+              if (type === 'group') {
+                newState.group = data as Group;
+              } else if (type === 'members') {
                 const membersData = data as { players: Player[], trainers: Trainer[] };
                 newState.players = sortPlayers(membersData.players);
                 newState.trainers = sortTrainers(membersData.trainers);
@@ -194,13 +210,16 @@ export const useStore = create<AppState>()(
             } else {
               // Map index to appropriate error handling
               if (index === 0) {
+                // Group call failed
+                newState.errors.group = result.reason?.message || 'Failed to load group';
+              } else if (index === 1) {
                 // Members call failed - set error for both players and trainers
                 newState.errors.players = result.reason?.message || 'Failed to load members';
                 newState.errors.trainers = result.reason?.message || 'Failed to load members';
-              } else if (index === 1) {
+              } else if (index === 2) {
                 // Events call failed
                 newState.errors.events = result.reason?.message || 'Failed to load events';
-              } else if (index === 2) {
+              } else if (index === 3) {
                 // ShirtSets call failed
                 newState.errors.shirtSets = result.reason?.message || 'Failed to load shirt sets';
               }
@@ -478,13 +497,15 @@ export const useStore = create<AppState>()(
 
 // Stable selectors to prevent infinite re-renders
 export const useAppLoading = () => useStore((state) => 
-  state.loading.players || state.loading.events || state.loading.trainers || state.loading.shirtSets
+  state.loading.group || state.loading.players || state.loading.events || state.loading.trainers || state.loading.shirtSets
 );
 
 export const useAppErrors = () => useStore((state) => state.errors);
 
 export const useAppHasErrors = () => useStore((state) => 
-  !!(state.errors.players || state.errors.events || state.errors.trainers || state.errors.shirtSets)
+  !!(state.errors.group || state.errors.players || state.errors.events || state.errors.trainers || state.errors.shirtSets)
 );
 
 export const useAppInitialized = () => useStore((state) => state.isInitialized);
+
+export const useGroup = () => useStore((state) => state.group);

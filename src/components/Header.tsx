@@ -1,10 +1,12 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { downloadDataAsJSON } from '../utils/localStorage';
+import { useGroup } from '../store/useStore';
 
 export default function Header() {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const group = useGroup();
 
   const handleExport = () => {
     downloadDataAsJSON();
@@ -31,7 +33,7 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           {/* Logo/Title */}
           <Link to="/" className="flex items-center">
-            <h1 className="text-xl font-bold">My Team</h1>
+            <h1 className="text-xl font-bold">{group?.name || 'My Team'}</h1>
           </Link>
 
           {/* Desktop Navigation */}

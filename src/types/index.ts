@@ -1,3 +1,8 @@
+export interface Group {
+  id: string;
+  name: string;
+}
+
 export interface Player {
   id: string;
   firstName: string;
