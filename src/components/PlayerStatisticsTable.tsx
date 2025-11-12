@@ -3,7 +3,7 @@ import { useState, useMemo } from 'react';
 import type { Player } from '../types';
 import Level from './Level';
 import { Card, CardBody } from './ui';
-import PlayerLevelFilter from './PlayerLevelFilter';
+import LevelRangeSelector from './LevelRangeSelector';
 
 interface PlayerStats {
   player: Player;
@@ -23,15 +23,11 @@ type SortDirection = 'asc' | 'desc';
 
 export default function PlayerStatisticsTable({ playerStats }: PlayerStatisticsTableProps) {
   const navigate = useNavigate();
-  const [minLevel, setMinLevel] = useState<number>(1);
-  const [maxLevel, setMaxLevel] = useState<number>(5);
+  const [levelRange, setLevelRange] = useState<[number, number]>([1, 5]);
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
-  const handleReset = () => {
-    setMinLevel(1);
-    setMaxLevel(5);
-  };
+  const [minLevel, maxLevel] = levelRange;
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -106,12 +102,9 @@ export default function PlayerStatisticsTable({ playerStats }: PlayerStatisticsT
     <Card>
       <CardBody>        
         {/* Level Filter */}
-        <PlayerLevelFilter
-          minLevel={minLevel}
-          maxLevel={maxLevel}
-          onMinLevelChange={setMinLevel}
-          onMaxLevelChange={setMaxLevel}
-          onReset={handleReset}
+        <LevelRangeSelector
+          defaultRange={levelRange}
+          onChange={setLevelRange}
         />
         
         {filteredPlayerStats.length === 0 ? (

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { Player, Event } from '../types';
 import { Card, CardBody } from './ui';
 import { formatDate } from '../utils/dateFormatter';
-import PlayerLevelFilter from './PlayerLevelFilter';
+import LevelRangeSelector from './LevelRangeSelector';
 import Level from './Level';
 
 interface EventAttendanceMatrixProps {
@@ -13,13 +13,9 @@ interface EventAttendanceMatrixProps {
 
 export default function EventAttendanceMatrix({ players, events }: EventAttendanceMatrixProps) {
   const navigate = useNavigate();
-  const [minLevel, setMinLevel] = useState<number>(1);
-  const [maxLevel, setMaxLevel] = useState<number>(5);
+  const [levelRange, setLevelRange] = useState<[number, number]>([1, 5]);
 
-  const handleReset = () => {
-    setMinLevel(1);
-    setMaxLevel(5);
-  };
+  const [minLevel, maxLevel] = levelRange;
 
   const handlePlayerClick = (playerId: string) => {
     navigate(`/players/${playerId}`);
@@ -95,12 +91,9 @@ export default function EventAttendanceMatrix({ players, events }: EventAttendan
     <Card>
       <CardBody>        
         {/* Level Filter */}
-        <PlayerLevelFilter
-          minLevel={minLevel}
-          maxLevel={maxLevel}
-          onMinLevelChange={setMinLevel}
-          onMaxLevelChange={setMaxLevel}
-          onReset={handleReset}
+        <LevelRangeSelector
+          defaultRange={levelRange}
+          onChange={setLevelRange}
         />
 
         <div className="mt-4 text-xs text-gray-600 mb-4 flex flex-wrap gap-4">
