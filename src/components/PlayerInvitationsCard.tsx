@@ -14,6 +14,8 @@ interface PlayerInvitationsCardProps {
   assignedPlayerIds?: string[];
 }
 
+type TabType = 'accepted' | 'declined' | 'open';
+
 export default function PlayerInvitationsCard({
   invitations,
   currentEvent,
@@ -24,6 +26,7 @@ export default function PlayerInvitationsCard({
   onRemoveInvitation,
   assignedPlayerIds = [],
 }: PlayerInvitationsCardProps) {
+  const [activeTab, setActiveTab] = useState<TabType>('accepted');
   const [showOnlyAvailable, setShowOnlyAvailable] = useState(true);
 
   // Function to calculate real-time statistics including current event state
@@ -50,62 +53,91 @@ export default function PlayerInvitationsCard({
   const acceptedCount = invitations.filter(inv => inv.status === 'accepted').length;
   const openCount = invitations.filter(inv => inv.status === 'open').length;
   const declinedCount = invitations.filter(inv => inv.status === 'declined').length;
-  const hasAnySelections = assignedPlayerIds.length > 0;
 
-  // Filter invitations based on toggle state
-  const filteredInvitations = showOnlyAvailable 
-    ? invitations.filter(inv => 
-        inv.status === 'accepted' && !assignedPlayerIds.includes(inv.playerId)
-      )
-    : invitations;
+  // Get invitations for the current tab
+  const tabInvitations = invitations.filter(inv => inv.status === activeTab);
+
+  // Filter by availability only on accepted tab when toggle is enabled
+  const filteredInvitations = activeTab === 'accepted' && showOnlyAvailable
+    ? tabInvitations.filter(inv => !assignedPlayerIds.includes(inv.playerId))
+    : tabInvitations;
 
   return (
     <div className="bg-white shadow rounded-lg p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold text-gray-900">Player Invitations</h2>
+        <h2 className="text-lg font-semibold text-gray-900">Players</h2>
         <div className="flex items-center gap-3">
-          <label className="flex items-center gap-2 text-sm text-gray-600">
-            <input
-              type="checkbox"
-              checked={showOnlyAvailable}
-              onChange={(e) => setShowOnlyAvailable(e.target.checked)}
-              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            />
-            Available only
-          </label>
-          <div className="flex gap-2">
-            <button 
-              onClick={onInviteClick}
-              className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm"
-            >
-              Invite Players
-            </button>
-          </div>
+          {activeTab === 'accepted' && (
+            <label className="flex items-center gap-2 text-sm text-gray-600">
+              <input
+                type="checkbox"
+                checked={showOnlyAvailable}
+                onChange={(e) => setShowOnlyAvailable(e.target.checked)}
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              Available only
+            </label>
+          )}
+          <button 
+            onClick={onInviteClick}
+            className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm"
+          >
+            Invite Players
+          </button>
         </div>
       </div>
-      {invitations.length > 0 && (
-        <div className="mb-3 text-sm text-gray-600">
-          <span className="text-green-600 font-medium">{acceptedCount}</span>
-          {' / '}
-          <span className="text-yellow-600 font-medium">{openCount}</span>
-          {' / '}
-          <span className="text-red-600 font-medium">{declinedCount}</span>
-          <span className="ml-2 text-gray-500">(accepted / open / declined)</span>
-          {showOnlyAvailable && (
-            <span className="ml-2 text-blue-600">
-              • Showing {filteredInvitations.length} available
-            </span>
-          )}
+
+      {/* Tab Navigation */}
+      <div className="border-b border-gray-200 mb-4">
+        <nav className="-mb-px flex space-x-8">
+          <button
+            onClick={() => setActiveTab('accepted')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'accepted'
+                ? 'border-green-500 text-green-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            Accepted ({acceptedCount})
+          </button>
+          <button
+            onClick={() => setActiveTab('open')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'open'
+                ? 'border-yellow-500 text-yellow-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            Open ({openCount})
+          </button>
+          <button
+            onClick={() => setActiveTab('declined')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'declined'
+                ? 'border-red-500 text-red-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            Declined ({declinedCount})
+          </button>
+        </nav>
+      </div>
+
+      {activeTab === 'accepted' && filteredInvitations.length < tabInvitations.length && (
+        <div className="mb-3 text-sm text-blue-600">
+          Showing {filteredInvitations.length} of {tabInvitations.length} available players
         </div>
       )}
       {filteredInvitations.length === 0 ? (
         <div className="text-gray-500 text-center py-4">
           {invitations.length === 0 ? (
             <p>No invitations sent yet.</p>
-          ) : showOnlyAvailable ? (
+          ) : tabInvitations.length === 0 ? (
+            <p>No players have {activeTab === 'accepted' ? 'accepted' : activeTab === 'declined' ? 'declined' : 'open'} invitations.</p>
+          ) : activeTab === 'accepted' && showOnlyAvailable ? (
             <p>No available players. All accepted players are already assigned to teams.</p>
           ) : (
-            <p>No invitations match current filter.</p>
+            <p>No players in this category.</p>
           )}
         </div>
       ) : (
@@ -126,8 +158,10 @@ export default function PlayerInvitationsCard({
             const player = players.find(p => p.id === invitation.playerId);
             const isAccepted = invitation.status === 'accepted';
             const isAssigned = assignedPlayerIds.includes(invitation.playerId);
-            const isDraggable = isAccepted && !isAssigned;
-            const shouldDim = hasAnySelections && (invitation.status === 'declined' || invitation.status === 'open' || isAssigned);
+            // Only allow dragging if we're on the accepted tab, player is accepted, and not assigned
+            const isDraggable = activeTab === 'accepted' && isAccepted && !isAssigned;
+            // Only dim assigned players on the accepted tab since we have separate tabs now
+            const shouldDim = activeTab === 'accepted' && isAssigned;
             
             // Calculate player statistics including current event real-time state
             const stats = getPlayerStatsWithCurrent(invitation.playerId);
@@ -135,7 +169,9 @@ export default function PlayerInvitationsCard({
             return (
               <div 
                 key={invitation.id} 
-                className={`border border-gray-200 rounded-lg p-3 ${isDraggable ? 'cursor-move' : ''} ${shouldDim ? 'opacity-40' : ''}`}
+                className={`border border-gray-200 rounded-lg p-3 transition-all ${
+                  isDraggable ? 'cursor-move hover:border-green-300 hover:bg-green-50' : ''
+                } ${shouldDim ? 'opacity-40' : ''}`}
                 draggable={isDraggable}
                 onDragStart={(e) => {
                   if (isDraggable) {
@@ -148,6 +184,11 @@ export default function PlayerInvitationsCard({
                   <div className="flex items-center gap-2 flex-1">
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
+                        {isDraggable && (
+                          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9h8M8 15h8" />
+                          </svg>
+                        )}
                         <span className="text-sm text-gray-900">
                           {player ? `${player.firstName} ${player.lastName}` : `Player ID: ${invitation.playerId}`}
                         </span>
