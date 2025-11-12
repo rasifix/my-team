@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useEvents } from '../hooks/useEvents';
+import { useTrainers } from '../store/useStore';
 import EventsList from '../components/EventsList';
 import AddEventModal from '../components/AddEventModal';
 import type { Team } from '../types';
@@ -10,6 +11,7 @@ import Button from '../components/ui/Button';
 export default function EventsPage() {
   const navigate = useNavigate();
   const { events, loading, error, addEvent } = useEvents();
+  const trainers = useTrainers();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Get current date for comparison
@@ -99,6 +101,7 @@ export default function EventsPage() {
             
             <EventsList 
               events={futureEvents} 
+              trainers={trainers}
               onEventClick={handleEventClick}
             />
           </CardBody>
@@ -112,6 +115,7 @@ export default function EventsPage() {
               
               <EventsList 
                 events={pastEvents} 
+                trainers={trainers}
                 onEventClick={handleEventClick}
               />
             </CardBody>

@@ -1,13 +1,14 @@
-import type { Event } from '../types';
+import type { Event, Trainer } from '../types';
 import Strength from './Strength';
 import { formatDate } from '../utils/dateFormatter';
 
 interface EventsListProps {
   events: Event[];
+  trainers?: Trainer[];
   onEventClick?: (eventId: string) => void;
 }
 
-export default function EventsList({ events, onEventClick }: EventsListProps) {
+export default function EventsList({ events, trainers = [], onEventClick }: EventsListProps) {
   if (events.length === 0) {
     return (
       <div className="text-gray-500 text-center py-8">
@@ -21,7 +22,7 @@ export default function EventsList({ events, onEventClick }: EventsListProps) {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       {events.map((event) => {
         const hasSelections = event.teams.some(team => team.selectedPlayers?.length > 0);
         
@@ -38,11 +39,19 @@ export default function EventsList({ events, onEventClick }: EventsListProps) {
                   <p className="text-sm text-gray-600">
                     📅 {formatDate(event.date)}
                   </p>
-                  {event.teams.map((team) => (
-                    <p key={team.id} className="text-sm text-gray-600 flex items-center gap-1">
-                      🕐 {team.startTime} 👥 {team.name} <Strength level={team.strength} />
-                    </p>
-                  ))}
+                  {event.teams.map((team) => {
+                    const trainer = team.trainerId ? trainers.find(t => t.id === team.trainerId) : null;
+                    return (
+                      <p key={team.id} className="text-sm text-gray-600 flex items-center gap-1">
+                        🕐 {team.startTime} 👥 {team.name} <Strength level={team.strength} />
+                        {trainer && (
+                          <span className="text-sm text-gray-600">
+                            👨‍🏫 {trainer.firstName} {trainer.lastName}
+                          </span>
+                        )}
+                      </p>
+                    );
+                  })}
                   <p className="text-sm text-gray-600">
                     ✉️ {event.invitations.length} {event.invitations.length === 1 ? 'invitation' : 'invitations'}
                   </p>

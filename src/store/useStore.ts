@@ -509,3 +509,5 @@ export const useAppHasErrors = () => useStore((state) =>
 export const useAppInitialized = () => useStore((state) => state.isInitialized);
 
 export const useGroup = () => useStore((state) => state.group);
+
+export const useTrainers = () => useStore((state) => state.trainers);
