@@ -74,14 +74,11 @@ export default function TeamPrintSummary({
                   {/* Header */}
                   <div className="text-center mb-4 border-b border-gray-200 pb-3">
                     <h2 className="text-lg font-semibold text-gray-700 mb-1">{event.name}</h2>
-                    <h1 className="text-xl font-bold text-gray-900 mb-1">{team.name}</h1>
+                    <h1 className="text-xl font-bold text-gray-900 mb-1">Team {team.name}</h1>
                     <div className="text-sm text-gray-600">
                       <p>📅 {formatDate(event.date)} 🕐 {team.startTime}</p>
                       {trainer && (
-                        <p className="text-blue-600 font-medium">👨‍🏫 {trainer.firstName} {trainer.lastName}</p>
-                      )}
-                      {shirtSet && (
-                        <p className="text-gray-600 font-medium">👕 {shirtSet.sponsor}</p>
+                        <p className="text-blue-600 font-medium">👤 {trainer.firstName} {trainer.lastName}</p>
                       )}
                     </div>
                   </div>
