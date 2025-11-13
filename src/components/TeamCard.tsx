@@ -103,7 +103,7 @@ export default function TeamCard({
           </p>
           {trainer && (
             <p className="text-sm text-blue-600">
-              👨‍🏫 {trainer.firstName} {trainer.lastName}
+              👤 {trainer.firstName} {trainer.lastName}
             </p>
           )}
           {shirtSet && (

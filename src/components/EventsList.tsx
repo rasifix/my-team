@@ -46,7 +46,7 @@ export default function EventsList({ events, trainers = [], onEventClick }: Even
                         🕐 {team.startTime} 👥 {team.name} <Strength level={team.strength} />
                         {trainer && (
                           <span className="text-sm text-gray-600">
-                            👨‍🏫 {trainer.firstName} {trainer.lastName}
+                            👤 {trainer.firstName} {trainer.lastName}
                           </span>
                         )}
                       </p>
