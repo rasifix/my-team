@@ -8,6 +8,7 @@ export interface Player {
   firstName: string;
   lastName: string;
   birthYear: number;
+  birthDate?: string; // ISO date string
   level: number; // 1-5
 }
 

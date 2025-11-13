@@ -15,7 +15,7 @@ export default function AddPlayerModal({ isOpen, onClose, onSave, onUpdate, edit
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    birthYear: new Date().getFullYear(),
+    birthDate: '',
     level: 3
   });
 
@@ -27,14 +27,14 @@ export default function AddPlayerModal({ isOpen, onClose, onSave, onUpdate, edit
       setFormData({
         firstName: editingPlayer.firstName,
         lastName: editingPlayer.lastName,
-        birthYear: editingPlayer.birthYear,
+        birthDate: editingPlayer.birthDate || '',
         level: editingPlayer.level
       });
     } else {
       setFormData({
         firstName: '',
         lastName: '',
-        birthYear: new Date().getFullYear() - 10,
+        birthDate: '',
         level: 3
       });
     }
@@ -42,11 +42,20 @@ export default function AddPlayerModal({ isOpen, onClose, onSave, onUpdate, edit
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.firstName.trim() && formData.lastName.trim()) {
+    if (formData.firstName.trim() && formData.lastName.trim() && formData.birthDate) {
+      const birthYear = new Date(formData.birthDate).getFullYear();
+      const playerData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        birthYear: birthYear,
+        birthDate: formData.birthDate,
+        level: formData.level
+      };
+
       if (isEditMode && editingPlayer && onUpdate) {
-        onUpdate(editingPlayer.id, formData);
+        onUpdate(editingPlayer.id, playerData);
       } else {
-        onSave(formData);
+        onSave(playerData);
       }
       
         // Reset form only if not editing
@@ -54,7 +63,7 @@ export default function AddPlayerModal({ isOpen, onClose, onSave, onUpdate, edit
           setFormData({
             firstName: '',
             lastName: '',
-            birthYear: new Date().getFullYear() - 10,
+            birthDate: '',
             level: 3
           });
         }
@@ -63,9 +72,10 @@ export default function AddPlayerModal({ isOpen, onClose, onSave, onUpdate, edit
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'birthYear' || name === 'level' ? parseInt(value) : value
+      [name]: name === 'level' ? parseInt(value) : value
     }));
   };  return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -111,17 +121,15 @@ export default function AddPlayerModal({ isOpen, onClose, onSave, onUpdate, edit
             </div>
 
             <div>
-              <label htmlFor="birthYear" className="form-label">
-                Birth Year
+              <label htmlFor="birthDate" className="form-label">
+                Birth Date
               </label>
               <input
-                type="number"
-                id="birthYear"
-                name="birthYear"
-                value={formData.birthYear}
+                type="date"
+                id="birthDate"
+                name="birthDate"
+                value={formData.birthDate}
                 onChange={handleChange}
-                min="1950"
-                max={new Date().getFullYear()}
                 required
                 className="form-input"
               />

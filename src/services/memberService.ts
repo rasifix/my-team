@@ -35,7 +35,7 @@ export async function updatePlayer(id: string, playerData: Partial<Player>): Pro
     apiClient.getGroupEndpoint(`/members/${id}`),
     {
       method: 'PUT',
-      body: JSON.stringify(playerData)
+      body: JSON.stringify({ ...playerData, role: 'player' })
     }
   );
 }

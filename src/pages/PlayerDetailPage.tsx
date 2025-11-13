@@ -159,7 +159,16 @@ export default function PlayerDetailPage() {
         <div className="flex justify-between items-start gap-4">
           <div className="flex items-center gap-4 flex-1">
             <h1 className="page-title">{player.firstName} {player.lastName}</h1>
-            <span className="text-gray-600">{player.birthYear}</span>
+            <div className="text-gray-600 text-sm">
+              {player.birthDate ? (
+                <div>
+                  <span>{new Date(player.birthDate).toLocaleDateString()}</span>
+                  <span className="text-gray-400 ml-1">({player.birthYear})</span>
+                </div>
+              ) : (
+                <span>{player.birthYear}</span>
+              )}
+            </div>
             <div className="flex items-center gap-1">
               <Level level={player.level} />
             </div>

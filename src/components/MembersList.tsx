@@ -110,7 +110,9 @@ export default function MembersList<T extends Member>({
                   <p className="text-sm font-medium text-gray-900 truncate">
                     {member.firstName} {member.lastName}
                     {isPlayer(member) && (
-                      <span className="text-xs text-gray-500 ml-1">{member.birthYear}</span>
+                      <span className="text-xs text-gray-500 ml-1">
+                        {member.birthDate ? new Date(member.birthDate).getFullYear() : member.birthYear}
+                      </span>
                     )}
                   </p>
                 </div>
