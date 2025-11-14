@@ -28,6 +28,12 @@ export default function EventDetailPage() {
   // Get event from store
   const event = id ? getEventById(id) : null;
   
+  // Get sorted events for navigation
+  const sortedEvents = [...events].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  const currentEventIndex = event ? sortedEvents.findIndex(e => e.id === event.id) : -1;
+  const previousEvent = currentEventIndex > 0 ? sortedEvents[currentEventIndex - 1] : null;
+  const nextEvent = currentEventIndex >= 0 && currentEventIndex < sortedEvents.length - 1 ? sortedEvents[currentEventIndex + 1] : null;
+  
   // Determine loading and error states
   const loading = isLoading;
   const error = !id ? 'No event ID provided' : 
@@ -341,6 +347,48 @@ export default function EventDetailPage() {
   return (
     <div className="page-container">
       <div className="page-header">
+        {/* Navigation links */}
+        <div className="flex justify-between items-center mb-4 text-sm">
+          <div>
+            {previousEvent ? (
+              <button
+                onClick={() => navigate(`/events/${previousEvent.id}`)}
+                className="text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+              >
+                <span className="block sm:hidden">← Prev</span>
+                <span className="hidden sm:block">← {previousEvent.name}</span>
+              </button>
+            ) : (
+              <div className="text-gray-400">
+                <span className="block sm:hidden">← Prev</span>
+                <span className="hidden sm:block">← No previous event</span>
+              </div>
+            )}
+          </div>
+          <button
+            onClick={() => navigate('/events')}
+            className="text-gray-600 hover:text-gray-800 font-medium"
+          >
+            All Events
+          </button>
+          <div>
+            {nextEvent ? (
+              <button
+                onClick={() => navigate(`/events/${nextEvent.id}`)}
+                className="text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+              >
+                <span className="block sm:hidden">Next →</span>
+                <span className="hidden sm:block">{nextEvent.name} →</span>
+              </button>
+            ) : (
+              <div className="text-gray-400">
+                <span className="block sm:hidden">Next →</span>
+                <span className="hidden sm:block">No next event →</span>
+              </div>
+            )}
+          </div>
+        </div>
+        
         <div className="flex justify-between items-start gap-4">
           <div className="flex-1">
             <h1 className="page-title">{event.name}</h1>

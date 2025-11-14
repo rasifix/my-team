@@ -1,6 +1,5 @@
 import type { Event, Trainer } from '../types';
 import Strength from './Strength';
-import { formatDate } from '../utils/dateFormatter';
 
 interface EventCardProps {
   event: Event;
@@ -10,6 +9,19 @@ interface EventCardProps {
 
 export default function EventCard({ event, trainers = [], onClick }: EventCardProps) {
   const hasSelections = event.teams.some(team => team.selectedPlayers?.length > 0);
+  
+  // Parse date for display
+  const eventDate = new Date(event.date);
+  const month = eventDate.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+  const day = eventDate.getDate();
+  
+  // Get earliest start time and total teams count
+  const earliestStartTime = event.teams.length > 0 
+    ? event.teams
+        .map(team => team.startTime)
+        .sort()[0] // Sort times and get the first (earliest)
+    : undefined;
+  const teamsCount = event.teams.length;
 
   const handleClick = () => {
     onClick?.(event.id);
@@ -20,43 +32,64 @@ export default function EventCard({ event, trainers = [], onClick }: EventCardPr
       onClick={handleClick}
       className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all cursor-pointer"
     >
-      <div className="flex justify-between items-start">
-        <div className="flex-1">
-          <h3 className="text-lg font-semibold text-gray-900">{event.name}</h3>
-          <div className="mt-2 space-y-1">
-            <p className="text-sm text-gray-600">
-              📅 {formatDate(event.date)}
-            </p>
-            {event.teams.map((team) => {
-              const trainer = team.trainerId ? trainers.find(t => t.id === team.trainerId) : null;
-              return (
-                <p key={team.id} className="text-sm text-gray-600 flex items-center gap-1">
-                  🕐 {team.startTime} 👥 {team.name} <Strength level={team.strength} />
-                  {trainer && (
-                    <span className="text-sm text-gray-600">
-                      👤 {trainer.firstName} {trainer.lastName}
-                    </span>
-                  )}
-                </p>
-              );
-            })}
-            <p className="text-sm text-gray-600">
-              ✉️ {event.invitations.length} {event.invitations.length === 1 ? 'invitation' : 'invitations'}
-            </p>
-          </div>
+      <div className="flex items-start gap-4">
+        {/* Date column */}
+        <div className="flex-shrink-0 text-center bg-gray-50 rounded-lg p-3 min-w-[60px]">
+          <div className="text-xs font-medium text-gray-500">{month}</div>
+          <div className="text-xl font-bold text-gray-900">{day}</div>
         </div>
-        <div className="ml-4">
-          {hasSelections ? (
-            <div className="w-4 h-4 bg-green-600 rounded-full flex items-center justify-center">
-              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
+        
+        {/* Content and status */}
+        <div className="flex justify-between items-start flex-1">
+          <div className="flex-1">
+            <h3 className="text-md font-semibold text-gray-900">{event.name}</h3>
+            <div className="mt-2 space-y-1">
+              {/* Mobile view - simplified */}
+              <div className="block sm:hidden">
+                {earliestStartTime && (
+                  <p className="text-sm text-gray-600">
+                    🕐 {earliestStartTime}
+                  </p>
+                )}
+                <p className="text-sm text-gray-600">
+                  👥 {teamsCount} {teamsCount === 1 ? 'team' : 'teams'}
+                </p>
+              </div>
+              
+              {/* Desktop view - detailed */}
+              <div className="hidden sm:block space-y-1">
+                {event.teams.map((team) => {
+                  const trainer = team.trainerId ? trainers.find(t => t.id === team.trainerId) : null;
+                  return (
+                    <p key={team.id} className="text-sm text-gray-600 flex items-center gap-1">
+                      🕐 {team.startTime} 👥 {team.name} <Strength level={team.strength} />
+                      {trainer && (
+                        <span className="text-sm text-gray-600">
+                          👤 {trainer.firstName} {trainer.lastName}
+                        </span>
+                      )}
+                    </p>
+                  );
+                })}
+                <p className="text-sm text-gray-600">
+                  ✉️ {event.invitations.length} {event.invitations.length === 1 ? 'invitation' : 'invitations'}
+                </p>
+              </div>
             </div>
-          ) : (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-              Pending
-            </span>
-          )}
+          </div>
+          <div className="ml-4 hidden sm:block">
+            {hasSelections ? (
+              <div className="w-4 h-4 bg-green-600 rounded-full flex items-center justify-center">
+                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              </div>
+            ) : (
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                Pending
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </div>
