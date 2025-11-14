@@ -178,10 +178,7 @@ export default function PlayerDetailPage() {
         <div className="mt-6">
           <Card>
             <CardBody>
-              <CardTitle>Available Future Events</CardTitle>
-              <p className="text-sm text-gray-600 mt-1 mb-4">
-                Invite {player.firstName} to these upcoming events
-              </p>
+              <CardTitle>Events without Invitation</CardTitle>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                 {futureEventsWithoutInvitation.map((event) => (
                   <div 
