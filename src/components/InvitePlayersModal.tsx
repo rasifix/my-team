@@ -134,11 +134,13 @@ export default function InvitePlayersModal({
                       />
                       <div className="ml-3 flex-1">
                         <div className="flex items-center justify-between">
-                          <span className="font-medium text-gray-900">
-                            {player.firstName} {player.lastName}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-gray-900">
+                              {player.firstName} {player.lastName}
+                            </span>
+                            <span className="text-sm text-gray-600">{player.birthYear}</span>
+                          </div>
                           <div className="flex items-center gap-3 text-sm text-gray-600">
-                            <span>{player.birthYear}</span>
                             <Level level={player.level} />
                           </div>
                         </div>

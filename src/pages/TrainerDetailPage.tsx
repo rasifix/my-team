@@ -184,7 +184,7 @@ export default function TrainerDetailPage() {
                           <h3 className="font-semibold text-gray-900">{item.eventName}</h3>
                           <div className="flex items-center gap-4 mt-2">
                             <span className="text-sm text-gray-700">
-                              <strong>Team:</strong> {item.teamName}
+                              👥 {item.teamName}
                             </span>
                             <Strength level={item.teamStrength} />
                           </div>
