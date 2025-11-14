@@ -138,7 +138,7 @@ export default function InvitePlayersModal({
                             {player.firstName} {player.lastName}
                           </span>
                           <div className="flex items-center gap-3 text-sm text-gray-600">
-                            <span>Born: {player.birthYear}</span>
+                            <span>{player.birthYear}</span>
                             <Level level={player.level} />
                           </div>
                         </div>

@@ -21,7 +21,7 @@ export default function PlayerEventHistory({
           </div>
         ) : (
           <div className="mt-4">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-3  ">
               {eventHistory.map((item) => {
                 // Parse date for display
                 const eventDate = new Date(item.eventDate);
@@ -44,7 +44,7 @@ export default function PlayerEventHistory({
                       {/* Content and status */}
                       <div className="flex justify-between items-center flex-1">
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 truncate">{item.eventName}</h3>
+                          <h5 className="font-semibold text-gray-900 truncate">{item.eventName}</h5>
                           <div className="mt-2">
                             {item.isSelected ? (
                               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">

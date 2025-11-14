@@ -143,11 +143,8 @@ export default function PlayerDetailPage() {
               {player.birthDate ? (
                 <div>
                   <span>{new Date(player.birthDate).toLocaleDateString()}</span>
-                  <span className="text-gray-400 ml-1">({player.birthYear})</span>
                 </div>
-              ) : (
-                <span>{player.birthYear}</span>
-              )}
+              ) : <div></div>}
             </div>
             <div className="flex items-center gap-1">
               <Level level={player.level} />
