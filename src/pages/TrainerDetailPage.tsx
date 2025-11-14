@@ -167,11 +167,11 @@ export default function TrainerDetailPage() {
               <p className="text-sm text-gray-600 mt-1 mb-4">
                 Events where {trainer.firstName} was assigned as a trainer
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-hidden">
                 {trainerEventHistory.map((item) => (
                   <div
                     key={item.eventId}
-                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer min-w-0"
                     onClick={() => navigate(`/events/${item.eventId}`)}
                   >
                     <div className="flex items-center gap-4">
@@ -179,9 +179,9 @@ export default function TrainerDetailPage() {
                       <DateColumn date={item.eventDate} />
                       
                       {/* Content and chevron */}
-                      <div className="flex justify-between items-center flex-1">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900">{item.eventName}</h3>
+                      <div className="flex justify-between items-center flex-1 min-w-0">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-gray-900 truncate" title={item.eventName}>{item.eventName}</h3>
                           <div className="flex items-center gap-4 mt-2">
                             <span className="text-sm text-gray-700">
                               👥 {item.teamName}
@@ -189,7 +189,7 @@ export default function TrainerDetailPage() {
                             <Strength level={item.teamStrength} />
                           </div>
                         </div>
-                        <div className="ml-4">
+                        <div className="flex-shrink-0 ml-2">
                           <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                           </svg>

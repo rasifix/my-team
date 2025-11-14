@@ -179,11 +179,11 @@ export default function PlayerDetailPage() {
           <Card>
             <CardBody>
               <CardTitle>Events without Invitation</CardTitle>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 overflow-hidden">
                 {futureEventsWithoutInvitation.map((event) => (
                   <div 
                     key={event.id}
-                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer min-w-0"
                     onClick={() => navigate(`/events/${event.id}`)}
                   >
                     <div className="flex items-start gap-4">
@@ -191,9 +191,9 @@ export default function PlayerDetailPage() {
                       <DateColumn date={event.date} />
                       
                       {/* Content and status */}
-                      <div className="flex justify-between items-center flex-1">
+                      <div className="flex justify-between items-center flex-1 min-w-0">
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 truncate">{event.name}</h3>
+                          <h3 className="font-semibold text-gray-900 truncate" title={event.name}>{event.name}</h3>
                           <div className="mt-2">
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
                               Not Invited
@@ -202,7 +202,7 @@ export default function PlayerDetailPage() {
                         </div>
                         
                         {/* Chevron icon */}
-                        <div className="ml-4 flex-shrink-0">
+                        <div className="flex-shrink-0 ml-2">
                           <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                           </svg>
