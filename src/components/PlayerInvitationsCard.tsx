@@ -62,7 +62,7 @@ export default function PlayerInvitationsCard({
     : tabInvitations;
 
   return (
-    <div className="bg-white shadow rounded-lg p-6">
+    <div className="bg-white lg:shadow shadow-none lg:rounded-lg rounded-none lg:p-6 p-4 lg:border border-0">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold text-gray-900">Players</h2>
         <div className="flex items-center gap-3">

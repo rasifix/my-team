@@ -10,6 +10,7 @@ import EditEventModal from '../components/EditEventModal';
 import ConfirmDialog from '../components/ConfirmDialog';
 import TeamCard from '../components/TeamCard';
 import TeamPrintSummary from '../components/TeamPrintSummary';
+import Strength from '../components/Strength';
 import { formatDate } from '../utils/dateFormatter';
 
 export default function EventDetailPage() {
@@ -50,6 +51,8 @@ export default function EventDetailPage() {
   const [assigningShirtsTeam, setAssigningShirtsTeam] = useState<Team | null>(null);
   const [dragOverTeamId, setDragOverTeamId] = useState<string | null>(null);
   const [dragOverPlayerId, setDragOverPlayerId] = useState<string | null>(null);
+  const [swipedTeamId, setSwipedTeamId] = useState<string | null>(null);
+  const [teamToDelete, setTeamToDelete] = useState<string | null>(null);
 
   const handleAddTeam = async () => {
     if (!event || !id) return;
@@ -65,6 +68,46 @@ export default function EventDetailPage() {
     const updatedTeams = [...event.teams, newTeam];
     await updateEvent(id, { teams: updatedTeams });
     // Store will automatically update the event data
+  };
+
+  const handleTouchStartTeam = (teamId: string, e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    const startX = touch.clientX;
+    
+    const handleTouchMove = (moveEvent: TouchEvent) => {
+      const moveTouch = moveEvent.touches[0];
+      const diffX = startX - moveTouch.clientX;
+      
+      // If swiped left more than 50px, show delete button
+      if (diffX > 50 && swipedTeamId !== teamId) {
+        setSwipedTeamId(teamId);
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleTouchEnd);
+      }
+      // If swiped right more than 30px while delete button is showing, hide it
+      else if (diffX < -30 && swipedTeamId === teamId) {
+        setSwipedTeamId(null);
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleTouchEnd);
+      }
+    };
+    
+    const handleTouchEnd = () => {
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+    
+    document.addEventListener('touchmove', handleTouchMove);
+    document.addEventListener('touchend', handleTouchEnd);
+  };
+
+  const handleDeleteTeam = async () => {
+    if (!event || !id || !teamToDelete) return;
+
+    const updatedTeams = event.teams.filter(t => t.id !== teamToDelete);
+    await updateEvent(id, { teams: updatedTeams });
+    setTeamToDelete(null);
+    setSwipedTeamId(null);
   };
 
   const handleEditTeamName = (teamId: string, currentName: string, currentStrength: number, currentStartTime: string, currentTrainerId?: string) => {
@@ -345,8 +388,8 @@ export default function EventDetailPage() {
   }
 
   return (
-    <div className="page-container">
-      <div className="page-header">
+    <div className="page-container lg:px-4 px-0">
+      <div className="page-header px-4 lg:px-0">
         {/* Navigation links */}
         <div className="flex justify-between items-center mb-4 text-sm">
           <div>
@@ -365,12 +408,9 @@ export default function EventDetailPage() {
               </div>
             )}
           </div>
-          <button
-            onClick={() => navigate('/events')}
-            className="text-gray-600 hover:text-gray-800 font-medium"
-          >
-            All Events
-          </button>
+          <div className="text-sm font-medium text-gray-900">
+            {event.name}
+          </div>
           <div>
             {nextEvent ? (
               <button
@@ -391,7 +431,6 @@ export default function EventDetailPage() {
         
         <div className="flex justify-between items-start gap-4">
           <div className="flex-1">
-            <h1 className="page-title">{event.name}</h1>
             <p className="page-subtitle">
               📅 {formatDate(event.date)}
             </p>
@@ -413,15 +452,15 @@ export default function EventDetailPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-6 gap-y-6">
         {/* Teams Section */}
-        <div className="card card-body">
+        <div className="card card-body lg:p-6 p-4 lg:border border-0 lg:rounded-lg rounded-none lg:shadow shadow-none">
           <div className="flex justify-between items-center mb-4">
             <h2 className="card-title">Teams</h2>
             <div className="flex gap-2">
               <button 
                 onClick={() => setIsPrintSummaryOpen(true)}
-                className="btn-secondary btn-sm"
+                className="btn-secondary btn-sm hidden sm:block"
                 disabled={event.teams.length === 0}
               >
                 Print Teams
@@ -430,7 +469,7 @@ export default function EventDetailPage() {
                 onClick={handleAddTeam}
                 className="btn-primary btn-sm"
               >
-                Add Team
+                Add
               </button>
             </div>
           </div>
@@ -439,33 +478,95 @@ export default function EventDetailPage() {
               <p>No teams configured yet.</p>
             </div>
           ) : (
-            <div className="space-y-3">
-              {event.teams.map((team) => {
-                const isDragOver = dragOverTeamId === team.id;
-                
-                return (
-                  <TeamCard
-                    key={team.id}
-                    team={team}
-                    players={players}
-                    trainers={trainers}
-                    shirtSets={shirtSets}
-                    events={events}
-                    maxPlayersPerTeam={event.maxPlayersPerTeam}
-                    isDragOver={isDragOver}
-                    dragOverPlayerId={dragOverPlayerId}
-                    onEditTeam={handleEditTeamName}
-                    onAssignShirts={handleAssignShirts}
-                    onRemovePlayer={handleRemovePlayerFromTeam}
-                    onSwitchPlayers={handleSwitchPlayers}
-                    onAddPlayerToTeam={handleAddPlayerToTeam}
-                    onReplacePlayer={handleReplacePlayer}
-                    onDragOverTeam={setDragOverTeamId}
-                    onDragOverPlayer={setDragOverPlayerId}
-                  />
-                );
-              })}
-            </div>
+            <>
+              {/* Desktop view - Drag & Drop */}
+              <div className="hidden lg:block space-y-3">
+                {event.teams.map((team) => {
+                  const isDragOver = dragOverTeamId === team.id;
+                  
+                  return (
+                    <TeamCard
+                      key={team.id}
+                      team={team}
+                      players={players}
+                      trainers={trainers}
+                      shirtSets={shirtSets}
+                      events={events}
+                      maxPlayersPerTeam={event.maxPlayersPerTeam}
+                      isDragOver={isDragOver}
+                      dragOverPlayerId={dragOverPlayerId}
+                      onEditTeam={handleEditTeamName}
+                      onAssignShirts={handleAssignShirts}
+                      onRemovePlayer={handleRemovePlayerFromTeam}
+                      onSwitchPlayers={handleSwitchPlayers}
+                      onAddPlayerToTeam={handleAddPlayerToTeam}
+                      onReplacePlayer={handleReplacePlayer}
+                      onDragOverTeam={setDragOverTeamId}
+                      onDragOverPlayer={setDragOverPlayerId}
+                    />
+                  );
+                })}
+              </div>
+              
+              {/* Mobile view - Simple List */}
+              <div className="block lg:hidden">
+                {event.teams.map(team => {
+                  const playerCount = team.selectedPlayers?.length || 0;
+                  const trainer = team.trainerId ? trainers.find(t => t.id === team.trainerId) : null;
+                  
+                  return (
+                    <div
+                      key={team.id}
+                      className="relative overflow-hidden bg-white border-t border-gray-200 first:border-t-0"
+                    >
+                      {/* Main content */}
+                      <div
+                        className={`flex items-center justify-between p-4 transition-transform duration-200 cursor-pointer active:bg-gray-50 ${
+                          swipedTeamId === team.id ? '-translate-x-20' : 'translate-x-0'
+                        }`}
+                        onClick={() => {
+                          if (swipedTeamId !== team.id) {
+                            navigate(`/events/${id}/teams/${team.id}`);
+                          }
+                        }}
+                        onTouchStart={(e) => handleTouchStartTeam(team.id, e)}
+                      >
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-sm truncate">{team.name}</div>
+                          <div className="text-xs text-gray-500 mt-1 flex items-center gap-2 flex-wrap">
+                            <span>👥 {playerCount}/{event.maxPlayersPerTeam}</span>
+                            <span>🕐 {team.startTime}</span>
+                            <Strength level={team.strength} />
+                          </div>
+                          {trainer && (
+                            <div className="text-xs text-gray-500 mt-1">
+                              👤 {trainer.firstName} {trainer.lastName}
+                            </div>
+                          )}
+                        </div>
+                        <svg className="w-5 h-5 text-gray-400 flex-shrink-0 ml-2" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                        </svg>
+                      </div>
+
+                      {/* Delete button that appears on swipe */}
+                      <div 
+                        className={`absolute inset-y-0 right-0 flex items-center justify-center w-20 bg-red-600 transition-opacity duration-200 ${
+                          swipedTeamId === team.id ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                        }`}
+                      >
+                        <button
+                          className="flex items-center justify-center w-full h-full text-white font-medium text-sm"
+                          onClick={() => setTeamToDelete(team.id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
           )}
         </div>
 
@@ -533,6 +634,17 @@ export default function EventDetailPage() {
         cancelText="Cancel"
         onConfirm={confirmDeleteEvent}
         onCancel={cancelDeleteEvent}
+        confirmButtonColor="red"
+      />
+
+      <ConfirmDialog
+        isOpen={!!teamToDelete}
+        title="Delete Team"
+        message={`Are you sure you want to delete this team? All player assignments will be removed.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleDeleteTeam}
+        onCancel={() => setTeamToDelete(null)}
         confirmButtonColor="red"
       />
 

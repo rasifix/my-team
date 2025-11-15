@@ -11,6 +11,8 @@ import PlayerDetailPage from './pages/PlayerDetailPage';
 import TrainerDetailPage from './pages/TrainerDetailPage';
 import EventsPage from './pages/EventsPage';
 import EventDetailPage from './pages/EventDetailPage';
+import TeamDetailPage from './pages/TeamDetailPage';
+import TeamPlayerSelectionPage from './pages/TeamPlayerSelectionPage';
 import StatisticsPage from './pages/StatisticsPage';
 import PlayerStatisticsPage from './pages/PlayerStatisticsPage';
 import EventAttendancePage from './pages/EventAttendancePage';
@@ -55,6 +57,8 @@ function App() {
                   <Route path="/trainers/:id" element={<TrainerDetailPage />} />
                   <Route path="/events" element={<EventsPage />} />
                   <Route path="/events/:id" element={<EventDetailPage />} />
+                  <Route path="/events/:eventId/teams/:teamId" element={<TeamDetailPage />} />
+                  <Route path="/events/:eventId/teams/:teamId/select-players" element={<TeamPlayerSelectionPage />} />
                   <Route path="/shirts" element={<ShirtSetsPage />} />
                   <Route path="/statistics" element={<StatisticsPage />}>
                     <Route path="player-statistics" element={<PlayerStatisticsPage />} />
